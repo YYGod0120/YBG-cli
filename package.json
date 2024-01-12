@@ -1,0 +1,28 @@
+{
+  "name": "ybg-cli",
+  "version": "1.0.0",
+  "description": "Cli for yyblog",
+
+  "main": "index.js",
+  "scripts": {
+    "start": "tsup --watch && node ",
+    "build": "tsup --minify"
+  },
+  "bin": {
+    "ybg": "bin/index.js"
+  },
+  "author": "YYGod0120",
+  "license": "ISC",
+  "private": false,
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "dayjs": "^1.11.10",
+    "gray-matter": "^4.0.3",
+    "marked": "^11.1.1",
+    "tsup": "^8.0.1"
+  }
+}
