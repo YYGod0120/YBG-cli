@@ -1,10 +1,9 @@
 import path from "path";
 import fs from "fs";
-import { makeEssay } from "../compile/content";
+import { basePath, makeEssay } from "../compile/content";
 import { getRandomColor } from "../utils/randomColor";
 
 export function createEssay(date: string, title: string) {
-  const basePath = path.join(__dirname, "..");
   const _postsPath = path.join(basePath, "/_posts");
   const filePath = path.join(_postsPath, `${title}.md`);
   const mdFile = makeEssay(title, date);

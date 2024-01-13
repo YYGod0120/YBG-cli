@@ -1,12 +1,10 @@
 import path from "path";
 import fs from "fs";
-import { makeEssayPage } from "../compile/content";
+import { basePath, makeEssayPage } from "../compile/content";
 import { mdFile } from "../compile/extractMd";
 import { writeCSS } from "./EssayCss";
 import { rimrafSync } from "rimraf";
 import { getRandomColor } from "../utils/randomColor";
-
-const basePath = path.join(__dirname, "..");
 
 export function writeFile(files: mdFile[]) {
   files.forEach(async (file) => {

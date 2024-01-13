@@ -1,7 +1,6 @@
 import path from "path";
 import fs from "fs";
-
-const basePath = path.join(__dirname, "..");
+import { basePath } from "../compile/content";
 
 export function createImgs(title: string) {
   const foldPath = `${basePath}/public/imgs/${title}`;

@@ -1,4 +1,6 @@
+import path from "path";
 import { mdFile } from "./extractMd";
+export const basePath = path.join(__dirname, "../../");
 export const essayCss = `
 blockquote {
   margin-left: 0;

@@ -34,9 +34,11 @@ function UTCToString(date) {
 var currentDate = (0, import_dayjs.default)().format("YYYY-MM-DD");
 
 // src/compile/extractMd.ts
-var import_path = __toESM(require("path"));
+var import_path2 = __toESM(require("path"));
 
 // src/compile/content.ts
+var import_path = __toESM(require("path"));
+var basePath = import_path.default.join(__dirname, "../../");
 var essayCss = `
 blockquote {
   margin-left: 0;
@@ -128,13 +130,13 @@ function processHTML(html) {
 }
 
 // src/compile/extractMd.ts
-var basePath = import_path.default.join(__dirname, "..");
-var _postFolder = import_path.default.join(basePath, "/_posts");
+var basePath2 = import_path2.default.join(__dirname, "..");
+var _postFolder = import_path2.default.join(basePath2, "/_posts");
 async function fileToJSON() {
   let files = [];
   const fileList = import_fs.default.readdirSync(_postFolder);
   for (const file of fileList) {
-    const filePath = import_path.default.join(_postFolder, file);
+    const filePath = import_path2.default.join(_postFolder, file);
     const fileContent = import_fs.default.readFileSync(filePath, "utf-8");
     const parsedFile = (0, import_gray_matter.default)(fileContent);
     const newMatter = {
@@ -149,15 +151,14 @@ async function fileToJSON() {
 }
 
 // src/create/createPage.ts
-var import_path3 = __toESM(require("path"));
+var import_path4 = __toESM(require("path"));
 var import_fs3 = __toESM(require("fs"));
 
 // src/create/EssayCss.ts
-var import_path2 = __toESM(require("path"));
+var import_path3 = __toESM(require("path"));
 var import_fs2 = __toESM(require("fs"));
-var basePath2 = import_path2.default.join(__dirname, "..");
 function writeCSS() {
-  const filePath = import_path2.default.join(basePath2, "/app/essay/essay.css");
+  const filePath = import_path3.default.join(basePath, "/app/essay/essay.css");
   import_fs2.default.access(filePath, import_fs2.default.constants.F_OK, (err) => {
     if (err) {
       import_fs2.default.writeFile(filePath, essayCss, (writeErr) => {
@@ -180,13 +181,12 @@ function getRandomColor(string) {
 }
 
 // src/create/createPage.ts
-var basePath3 = import_path3.default.join(__dirname, "..");
 function writeFile(files) {
   files.forEach(async (file) => {
-    const foldPath = `${basePath3}/app/essay/${file.mdMatter.data.date}/${file.mdMatter.data.title}`;
-    const filePath = import_path3.default.join(foldPath, "page.tsx");
+    const foldPath = `${basePath}/app/essay/${file.mdMatter.data.date}/${file.mdMatter.data.title}`;
+    const filePath = import_path4.default.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
-    (0, import_rimraf.rimrafSync)(`${basePath3}/app/essay/`, {
+    (0, import_rimraf.rimrafSync)(`${basePath}/app/essay/`, {
       preserveRoot: false
     });
     import_fs3.default.mkdir(foldPath, { recursive: true }, (error) => {
@@ -214,12 +214,11 @@ function writeFile(files) {
 var import_cac = __toESM(require("cac"));
 
 // src/create/createMD.ts
-var import_path4 = __toESM(require("path"));
+var import_path5 = __toESM(require("path"));
 var import_fs4 = __toESM(require("fs"));
 function createEssay(date, title) {
-  const basePath6 = import_path4.default.join(__dirname, "..");
-  const _postsPath = import_path4.default.join(basePath6, "/_posts");
-  const filePath = import_path4.default.join(_postsPath, `${title}.md`);
+  const _postsPath = import_path5.default.join(basePath, "/_posts");
+  const filePath = import_path5.default.join(_postsPath, `${title}.md`);
   const mdFile = makeEssay(title, date);
   import_fs4.default.mkdir(_postsPath, { recursive: true }, (error) => {
     if (error) {
@@ -237,11 +236,9 @@ function createEssay(date, title) {
 }
 
 // src/create/createImg.ts
-var import_path5 = __toESM(require("path"));
 var import_fs5 = __toESM(require("fs"));
-var basePath4 = import_path5.default.join(__dirname, "..");
 function createImgs(title) {
-  const foldPath = `${basePath4}/public/imgs/${title}`;
+  const foldPath = `${basePath}/public/imgs/${title}`;
   import_fs5.default.mkdir(foldPath, { recursive: true }, (error) => {
     if (error)
       console.log(error);
@@ -252,9 +249,9 @@ function createImgs(title) {
 var import_path6 = __toESM(require("path"));
 var import_fs6 = __toESM(require("fs"));
 var import_rimraf2 = require("rimraf");
-var basePath5 = import_path6.default.join(__dirname, "..");
+var basePath3 = import_path6.default.join(__dirname, "..");
 function removePage(file) {
-  const MdPath = import_path6.default.join(basePath5, `/_posts/${file}.md`);
+  const MdPath = import_path6.default.join(basePath3, `/_posts/${file}.md`);
   import_fs6.default.unlink(MdPath, (err) => {
     if (err) {
       console.error(`Error deleting file: ${err}`);
@@ -262,7 +259,7 @@ function removePage(file) {
       console.log(`File-${file} deleted successfully`);
     }
   });
-  const foldPath = `${basePath5}/public/imgs/${file}`;
+  const foldPath = `${basePath3}/public/imgs/${file}`;
   (0, import_rimraf2.rimraf)(foldPath, { preserveRoot: false });
 }
 
