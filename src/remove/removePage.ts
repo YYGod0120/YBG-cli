@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { rimraf } from "rimraf";
-const basePath = path.join(__dirname, "..");
+import { basePath } from "../compile/content";
 
 export function removePage(file: string) {
   //   const PagePath = `${basePath}/app/essay/${file.mdMatter.data.date}`;

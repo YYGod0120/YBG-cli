@@ -3,8 +3,8 @@ import matter from "gray-matter";
 import { marked } from "marked";
 import { UTCToString } from "../utils/time";
 import path from "path";
-import { processHTML } from "./content";
-const basePath = path.join(__dirname, "..");
+import { basePath, processHTML } from "./content";
+
 const _postFolder = path.join(basePath, "/_posts");
 
 export type mdFile = {

@@ -130,8 +130,7 @@ function processHTML(html) {
 }
 
 // src/compile/extractMd.ts
-var basePath2 = import_path2.default.join(__dirname, "..");
-var _postFolder = import_path2.default.join(basePath2, "/_posts");
+var _postFolder = import_path2.default.join(basePath, "/_posts");
 async function fileToJSON() {
   let files = [];
   const fileList = import_fs.default.readdirSync(_postFolder);
@@ -249,9 +248,8 @@ function createImgs(title) {
 var import_path6 = __toESM(require("path"));
 var import_fs6 = __toESM(require("fs"));
 var import_rimraf2 = require("rimraf");
-var basePath3 = import_path6.default.join(__dirname, "..");
 function removePage(file) {
-  const MdPath = import_path6.default.join(basePath3, `/_posts/${file}.md`);
+  const MdPath = import_path6.default.join(basePath, `/_posts/${file}.md`);
   import_fs6.default.unlink(MdPath, (err) => {
     if (err) {
       console.error(`Error deleting file: ${err}`);
@@ -259,7 +257,7 @@ function removePage(file) {
       console.log(`File-${file} deleted successfully`);
     }
   });
-  const foldPath = `${basePath3}/public/imgs/${file}`;
+  const foldPath = `${basePath}/public/imgs/${file}`;
   (0, import_rimraf2.rimraf)(foldPath, { preserveRoot: false });
 }
 
