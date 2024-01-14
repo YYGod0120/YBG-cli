@@ -36,9 +36,9 @@ var currentDate = (0, import_dayjs.default)().format("YYYY-MM-DD");
 // src/compile/extractMd.ts
 var import_path2 = __toESM(require("path"));
 
-// src/compile/content.ts
+// src/locale/content.ts
 var import_path = __toESM(require("path"));
-var basePath = import_path.default.join(__dirname, "../../");
+var basePath = import_path.default.join(process.cwd(), "./");
 var essayCss = `
 blockquote {
   margin-left: 0;
@@ -99,7 +99,7 @@ excerpt:
 }
 async function makeEssayPage(file) {
   const template = `
-    import "../essay.css";
+    import "../../essay.css";
     import Image from "next/image";
     
     export default function Page() {
@@ -122,11 +122,15 @@ async function makeEssayPage(file) {
 }
 function processHTML(html) {
   const replacedText = html.replace(
-    /<img([^>]*)src="(\.\.\/public\/[^"]+)"([^>]*)>/g,
-    '<Image$1src="$2"$3 />'
+    /<img(.*?)src="(.*?)"/g,
+    '<Image$1src="$2"'
   );
-  const finalText = replacedText.replace(/\.\.\/public\//g, "/");
-  return finalText;
+  const finalText = replacedText.replace(
+    /<Image\s+src="\.\.\/(.*?)"/g,
+    '<Image src="/imgs/$1"'
+  );
+  const finalHtml = finalText.replace(/<Image(.*?)>/g, "<Image$1 />");
+  return finalHtml;
 }
 
 // src/compile/extractMd.ts
@@ -142,9 +146,9 @@ async function fileToJSON() {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
-    const htmlText = await (0, import_marked.marked)(parsedFile.content);
-    console.log(`Essay product`);
-    files.push({ mdMatter: newMatter, mdHtml: processHTML(htmlText) });
+    const htmlText = processHTML(await (0, import_marked.marked)(parsedFile.content));
+    console.log(file);
+    files.push({ mdMatter: newMatter, mdHtml: htmlText });
   }
   return files;
 }
@@ -181,11 +185,11 @@ function getRandomColor(string) {
 
 // src/create/createPage.ts
 function writeFile(files) {
-  files.forEach(async (file) => {
-    const foldPath = `${basePath}/app/essay/${file.mdMatter.data.date}/${file.mdMatter.data.title}`;
+  files.forEach(async (file, index) => {
+    const foldPath = `${basePath}/app/essay/${file.mdMatter.data.date}/${index + 1}`;
     const filePath = import_path4.default.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
-    (0, import_rimraf.rimrafSync)(`${basePath}/app/essay/`, {
+    (0, import_rimraf.rimrafSync)(`${basePath}/app/essay`, {
       preserveRoot: false
     });
     import_fs3.default.mkdir(foldPath, { recursive: true }, (error) => {
@@ -275,3 +279,4 @@ cli.command("remove [project]", "remove the new essay").action(async (project) =
   removePage(project);
 });
 cli.parse();
+//# sourceMappingURL=index.js.map

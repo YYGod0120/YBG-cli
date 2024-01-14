@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { basePath, essayCss } from "../compile/content";
+import { basePath, essayCss } from "../locale/content";
 export function writeCSS() {
   const filePath = path.join(basePath, "/app/essay/essay.css");
   fs.access(filePath, fs.constants.F_OK, (err) => {

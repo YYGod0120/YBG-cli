@@ -5,7 +5,6 @@ import { createEssay } from "../create/createMD";
 import { currentDate } from "../utils/time";
 import { createImgs } from "../create/createImg";
 import { removePage } from "../remove/removePage";
-
 const cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await fileToJSON();

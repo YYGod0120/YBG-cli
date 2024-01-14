@@ -1,6 +1,6 @@
 import path from "path";
-import { mdFile } from "./extractMd";
-export const basePath = path.join(__dirname, "../../");
+import { mdFile } from "../compile/extractMd";
+export const basePath = path.join(process.cwd(), "./");
 export const essayCss = `
 blockquote {
   margin-left: 0;
@@ -63,7 +63,7 @@ excerpt:
 
 export async function makeEssayPage(file: mdFile) {
   const template = `
-    import "../essay.css";
+    import "../../essay.css";
     import Image from "next/image";
     
     export default function Page() {
@@ -87,10 +87,14 @@ export async function makeEssayPage(file: mdFile) {
 
 export function processHTML(html: string) {
   const replacedText = html.replace(
-    /<img([^>]*)src="(\.\.\/public\/[^"]+)"([^>]*)>/g,
-    '<Image$1src="$2"$3 />'
+    /<img(.*?)src="(.*?)"/g,
+    '<Image$1src="$2"'
   );
   // 移除路径中的 ../public
-  const finalText = replacedText.replace(/\.\.\/public\//g, "/");
-  return finalText;
+  const finalText = replacedText.replace(
+    /<Image\s+src="\.\.\/(.*?)"/g,
+    '<Image src="/imgs/$1"'
+  );
+  const finalHtml = finalText.replace(/<Image(.*?)>/g, "<Image$1 />");
+  return finalHtml;
 }

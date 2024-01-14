@@ -8,4 +8,6 @@ export default defineConfig({
   format: ["cjs"],
   // 目标语法
   target: "es2020",
+  sourcemap: true,
+  outDir: "dist",
 });

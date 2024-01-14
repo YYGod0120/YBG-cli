@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { basePath, makeEssay } from "../compile/content";
+import { basePath, makeEssay } from "../locale/content";
 import { getRandomColor } from "../utils/randomColor";
 
 export function createEssay(date: string, title: string) {
