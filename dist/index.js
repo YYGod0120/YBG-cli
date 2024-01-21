@@ -2,10 +2,6 @@
 import fs from "fs";
 import matter from "gray-matter";
 import { marked } from "marked";
-import rehypeStringify from "rehype-stringify";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
 
 // src/utils/time.ts
 import dayjs from "dayjs";
@@ -106,11 +102,15 @@ function replaceClassName(html) {
   return processedHtml;
 }
 function highLightHtml(html) {
-  const replacedString = html.replace(
+  const replacedString1 = html.replace(/&quot;/g, '"');
+  const replacedString2 = replacedString1.replace(
     /<pre><code className="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
-    '<SyntaxHighlighter language="$1" style={oneLight} showLineNumbers>{` $2 `}</SyntaxHighlighter>'
+    (_, language, codeContent) => {
+      const codeWithBackslash = codeContent.replace(/([^\w\s"'])/g, "\\$1");
+      return `<SyntaxHighlighter language="${language}" style={oneLight} showLineNumbers>{ \`${codeWithBackslash}\` }</SyntaxHighlighter>`;
+    }
   );
-  return replacedString;
+  return replacedString2;
 }
 function compileHTML(html) {
   const step1Html = ImageRepimg(html);
@@ -134,8 +134,6 @@ async function fileToJSON() {
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
     const htmlText = compileHTML(await marked(parsedFile.content));
-    const test = await unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).process(parsedFile.content);
-    console.log(test);
     console.log(file);
     files.push({ mdMatter: newMatter, mdHtml: htmlText });
   }

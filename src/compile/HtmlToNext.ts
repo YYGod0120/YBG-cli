@@ -10,11 +10,17 @@ function replaceClassName(html: string) {
   return processedHtml;
 }
 function highLightHtml(html: string) {
-  const replacedString = html.replace(
+  const replacedString1 = html.replace(/&quot;/g, '"');
+  // 在代码块内的特殊字符前加上 \
+  const replacedString2 = replacedString1.replace(
     /<pre><code className="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
-    '<SyntaxHighlighter language="$1" style={oneLight} showLineNumbers>{` $2 `}</SyntaxHighlighter>'
+    (_, language, codeContent) => {
+      const codeWithBackslash = codeContent.replace(/([^\w\s"'])/g, "\\$1");
+      return `<SyntaxHighlighter language="${language}" style={oneLight} showLineNumbers>{ \`${codeWithBackslash}\` }</SyntaxHighlighter>`;
+    }
   );
-  return replacedString;
+
+  return replacedString2;
 }
 export function compileHTML(html: string) {
   //替换img标签

@@ -1,10 +1,7 @@
 import fs from "fs";
 import matter from "gray-matter";
 import { marked } from "marked";
-import rehypeStringify from "rehype-stringify";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
+
 import { UTCToString } from "../utils/time";
 import path from "path";
 import { basePath } from "../constant/content";
@@ -29,12 +26,6 @@ export async function fileToJSON(): Promise<mdFile[]> {
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
     const htmlText = compileHTML(await marked(parsedFile.content));
-    const test = await unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(rehypeStringify)
-      .process(parsedFile.content);
-    console.log(test);
 
     console.log(file);
 
