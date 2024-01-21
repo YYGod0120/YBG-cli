@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "Cli for yyblog",
   "main": "index.js",
+  "type":"module",
   "scripts": {
     "start": "tsup --watch  ",
     "build": "tsup --minify"
@@ -23,8 +24,12 @@
     "gray-matter": "^4.0.3",
     "marked": "^11.1.1",
     "picocolors": "^1.0.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.0",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
-    "tsup": "^8.0.1"
+    "tsup": "^8.0.1",
+    "unified": "^11.0.4"
   }
 }

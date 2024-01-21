@@ -1,44 +1,25 @@
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-
 // src/compile/extractMd.ts
-var import_fs = __toESM(require("fs"));
-var import_gray_matter = __toESM(require("gray-matter"));
-var import_marked = require("marked");
+import fs from "fs";
+import matter from "gray-matter";
+import { marked } from "marked";
+import rehypeStringify from "rehype-stringify";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import { unified } from "unified";
 
 // src/utils/time.ts
-var import_dayjs = __toESM(require("dayjs"));
+import dayjs from "dayjs";
 function UTCToString(date) {
-  return (0, import_dayjs.default)(date).format("YYYY-MM-DD");
+  return dayjs(date).format("YYYY-MM-DD");
 }
-var currentDate = (0, import_dayjs.default)().format("YYYY-MM-DD");
+var currentDate = dayjs().format("YYYY-MM-DD");
 
 // src/compile/extractMd.ts
-var import_path2 = __toESM(require("path"));
+import path2 from "path";
 
-// src/locale/content.ts
-var import_path = __toESM(require("path"));
-var basePath = import_path.default.join(process.cwd(), "./");
+// src/constant/content.ts
+import path from "path";
+var basePath = path.join(process.cwd(), "./");
 var essayCss = `
 blockquote {
   margin-left: 0;
@@ -51,8 +32,10 @@ ul {
   padding-left: 30px;
 }
 a {
-  display: inline-block;
-  position: relative;
+  text-decoration: none; /* \u79FB\u9664\u4E0B\u5212\u7EBF */
+  color: #1d9bf0; /* \u4F7F\u7528\u7EE7\u627F\u7684\u989C\u8272 */
+  cursor: pointer; /* \u4FEE\u6539\u9F20\u6807\u6837\u5F0F\u4E3A\u6307\u9488 */
+  outline: none; /* \u79FB\u9664\u9ED8\u8BA4\u7684\u7126\u70B9\u8FB9\u6846 */
 }
 p {
   margin-top: 18px;
@@ -69,22 +52,8 @@ h6 {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-a::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  transform: scaleX(0);
-  height: 1px;
-  bottom: 0;
-  left: 0;
-  background-color: #4e5969;
-  transform-origin: bottom right;
-  transition: transform 0.25s ease-out;
-}
-
-a:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+a:hover{
+  color:#0c7ad8
 }
 `;
 function makeEssay(title, date) {
@@ -101,14 +70,17 @@ async function makeEssayPage(file) {
   const template = `
     import "../../essay.css";
     import Image from "next/image";
-    
+    // @ts-ignore
+      import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+    // @ts-ignore
+    import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
     export default function Page() {
       return (
         <div className=" mt-8 bg-white w-[60vw] flex flex-col items-start text-lg">
           <span className="text-4xl text-left px-24 pt-12 text-visit-font font-bold">
             ${file.mdMatter.data.title}
           </span>
-          <span className=" text-[#86909C] px-24 pt-5 text-xl">
+          <span className=" text-[#86909C] px-24 pt-5 text-xl mb-5">
             Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
           </span>
           <div className="flex text-start flex-col pb-12 px-24">
@@ -120,51 +92,68 @@ async function makeEssayPage(file) {
     `;
   return template;
 }
-function processHTML(html) {
-  const replacedText = html.replace(
-    /<img(.*?)src="(.*?)"/g,
-    '<Image$1src="$2"'
+
+// src/compile/HtmlToNext.ts
+function ImageRepimg(html) {
+  const processedHtml = html.replace(
+    /<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g,
+    '<Image src="$1" alt="$2" width="700" height="450" />'
   );
-  const finalText = replacedText.replace(
-    /<Image\s+src="\.\.\/(.*?)"/g,
-    '<Image src="/imgs/$1"'
+  return processedHtml;
+}
+function replaceClassName(html) {
+  const processedHtml = html.replace(/class=/g, "className=");
+  return processedHtml;
+}
+function highLightHtml(html) {
+  const replacedString = html.replace(
+    /<pre><code className="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
+    '<SyntaxHighlighter language="$1" style={oneLight} showLineNumbers>{` $2 `}</SyntaxHighlighter>'
   );
-  const finalHtml = finalText.replace(/<Image(.*?)>/g, "<Image$1 />");
-  return finalHtml;
+  return replacedString;
+}
+function compileHTML(html) {
+  const step1Html = ImageRepimg(html);
+  const step2Html = replaceClassName(step1Html);
+  const step3Html = highLightHtml(step2Html);
+  console.log(1);
+  return step3Html;
 }
 
 // src/compile/extractMd.ts
-var _postFolder = import_path2.default.join(basePath, "/_posts");
+var _postFolder = path2.join(basePath, "/_posts");
 async function fileToJSON() {
   let files = [];
-  const fileList = import_fs.default.readdirSync(_postFolder);
+  const fileList = fs.readdirSync(_postFolder);
   for (const file of fileList) {
-    const filePath = import_path2.default.join(_postFolder, file);
-    const fileContent = import_fs.default.readFileSync(filePath, "utf-8");
-    const parsedFile = (0, import_gray_matter.default)(fileContent);
+    const filePath = path2.join(_postFolder, file);
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    const parsedFile = matter(fileContent);
     const newMatter = {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
-    const htmlText = processHTML(await (0, import_marked.marked)(parsedFile.content));
+    const htmlText = compileHTML(await marked(parsedFile.content));
+    const test = await unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).process(parsedFile.content);
+    console.log(test);
     console.log(file);
     files.push({ mdMatter: newMatter, mdHtml: htmlText });
   }
   return files;
 }
 
-// src/create/createPage.ts
-var import_path4 = __toESM(require("path"));
-var import_fs3 = __toESM(require("fs"));
+// src/create/mdToPage.ts
+import path4 from "path";
+import fs3 from "fs";
 
 // src/create/EssayCss.ts
-var import_path3 = __toESM(require("path"));
-var import_fs2 = __toESM(require("fs"));
+import path3 from "path";
+import fs2 from "fs";
 function writeCSS() {
-  const filePath = import_path3.default.join(basePath, "/app/essay/essay.css");
-  import_fs2.default.access(filePath, import_fs2.default.constants.F_OK, (err) => {
+  const filePath = path3.join(basePath, "/app/essay/essay.css");
+  fs2.access(filePath, fs2.constants.F_OK, (err) => {
     if (err) {
-      import_fs2.default.writeFile(filePath, essayCss, (writeErr) => {
+      fs2.writeFile(filePath, essayCss, (writeErr) => {
         if (writeErr)
           throw writeErr;
       });
@@ -172,32 +161,33 @@ function writeCSS() {
   });
 }
 
-// src/create/createPage.ts
-var import_rimraf = require("rimraf");
+// src/create/mdToPage.ts
+import { rimrafSync } from "rimraf";
 
 // src/utils/randomColor.ts
-var import_picocolors = require("picocolors");
+import pkg from "picocolors";
+var { cyan, yellow, green, red, blue } = pkg;
 function getRandomColor(string) {
-  const colors = [import_picocolors.cyan, import_picocolors.yellow, import_picocolors.green, import_picocolors.blue, import_picocolors.red];
+  const colors = [cyan, yellow, green, red, blue];
   const randomIndex = Math.floor(Math.random() * colors.length);
   return colors[randomIndex](string);
 }
 
-// src/create/createPage.ts
+// src/create/mdToPage.ts
 function writeFile(files) {
+  rimrafSync(`${basePath}/app/essay`, {
+    preserveRoot: false
+  });
   files.forEach(async (file, index) => {
     const foldPath = `${basePath}/app/essay/${file.mdMatter.data.date}/${index + 1}`;
-    const filePath = import_path4.default.join(foldPath, "page.tsx");
+    const filePath = path4.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
-    (0, import_rimraf.rimrafSync)(`${basePath}/app/essay`, {
-      preserveRoot: false
-    });
-    import_fs3.default.mkdir(foldPath, { recursive: true }, (error) => {
+    fs3.mkdir(foldPath, { recursive: true }, (error) => {
       if (error) {
         console.log(error);
       } else {
         writeCSS();
-        import_fs3.default.writeFile(filePath, content, (err) => {
+        fs3.writeFile(filePath, content, (err) => {
           if (err) {
             console.error("Error creating file:", err);
           } else {
@@ -214,20 +204,20 @@ function writeFile(files) {
 }
 
 // src/node/cli.ts
-var import_cac = __toESM(require("cac"));
+import cac from "cac";
 
 // src/create/createMD.ts
-var import_path5 = __toESM(require("path"));
-var import_fs4 = __toESM(require("fs"));
+import path5 from "path";
+import fs4 from "fs";
 function createEssay(date, title) {
-  const _postsPath = import_path5.default.join(basePath, "/_posts");
-  const filePath = import_path5.default.join(_postsPath, `${title}.md`);
+  const _postsPath = path5.join(basePath, "/_posts");
+  const filePath = path5.join(_postsPath, `${title}.md`);
   const mdFile = makeEssay(title, date);
-  import_fs4.default.mkdir(_postsPath, { recursive: true }, (error) => {
+  fs4.mkdir(_postsPath, { recursive: true }, (error) => {
     if (error) {
       console.log(error);
     } else {
-      import_fs4.default.writeFile(filePath, mdFile, (err) => {
+      fs4.writeFile(filePath, mdFile, (err) => {
         if (err) {
           console.error("Error creating file:", err);
         } else {
@@ -239,22 +229,22 @@ function createEssay(date, title) {
 }
 
 // src/create/createImg.ts
-var import_fs5 = __toESM(require("fs"));
+import fs5 from "fs";
 function createImgs(title) {
   const foldPath = `${basePath}/public/imgs/${title}`;
-  import_fs5.default.mkdir(foldPath, { recursive: true }, (error) => {
+  fs5.mkdir(foldPath, { recursive: true }, (error) => {
     if (error)
       console.log(error);
   });
 }
 
 // src/remove/removePage.ts
-var import_path6 = __toESM(require("path"));
-var import_fs6 = __toESM(require("fs"));
-var import_rimraf2 = require("rimraf");
+import path6 from "path";
+import fs6 from "fs";
+import { rimraf } from "rimraf";
 function removePage(file) {
-  const MdPath = import_path6.default.join(basePath, `/_posts/${file}.md`);
-  import_fs6.default.unlink(MdPath, (err) => {
+  const MdPath = path6.join(basePath, `/_posts/${file}.md`);
+  fs6.unlink(MdPath, (err) => {
     if (err) {
       console.error(`Error deleting file: ${err}`);
     } else {
@@ -262,11 +252,11 @@ function removePage(file) {
     }
   });
   const foldPath = `${basePath}/public/imgs/${file}`;
-  (0, import_rimraf2.rimraf)(foldPath, { preserveRoot: false });
+  rimraf(foldPath, { preserveRoot: false });
 }
 
 // src/node/cli.ts
-var cli = (0, import_cac.default)();
+var cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await fileToJSON();
   writeFile(files);

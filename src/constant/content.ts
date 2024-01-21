@@ -13,8 +13,10 @@ ul {
   padding-left: 30px;
 }
 a {
-  display: inline-block;
-  position: relative;
+  text-decoration: none; /* 移除下划线 */
+  color: #1d9bf0; /* 使用继承的颜色 */
+  cursor: pointer; /* 修改鼠标样式为指针 */
+  outline: none; /* 移除默认的焦点边框 */
 }
 p {
   margin-top: 18px;
@@ -31,22 +33,8 @@ h6 {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-a::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  transform: scaleX(0);
-  height: 1px;
-  bottom: 0;
-  left: 0;
-  background-color: #4e5969;
-  transform-origin: bottom right;
-  transition: transform 0.25s ease-out;
-}
-
-a:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+a:hover{
+  color:#0c7ad8
 }
 `;
 
@@ -65,14 +53,17 @@ export async function makeEssayPage(file: mdFile) {
   const template = `
     import "../../essay.css";
     import Image from "next/image";
-    
+    // @ts-ignore
+      import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+    // @ts-ignore
+    import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
     export default function Page() {
       return (
         <div className=" mt-8 bg-white w-[60vw] flex flex-col items-start text-lg">
           <span className="text-4xl text-left px-24 pt-12 text-visit-font font-bold">
             ${file.mdMatter.data.title}
           </span>
-          <span className=" text-[#86909C] px-24 pt-5 text-xl">
+          <span className=" text-[#86909C] px-24 pt-5 text-xl mb-5">
             Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
           </span>
           <div className="flex text-start flex-col pb-12 px-24">
@@ -83,18 +74,4 @@ export async function makeEssayPage(file: mdFile) {
       }
     `;
   return template;
-}
-
-export function processHTML(html: string) {
-  const replacedText = html.replace(
-    /<img(.*?)src="(.*?)"/g,
-    '<Image$1src="$2"'
-  );
-  // 移除路径中的 ../public
-  const finalText = replacedText.replace(
-    /<Image\s+src="\.\.\/(.*?)"/g,
-    '<Image src="/imgs/$1"'
-  );
-  const finalHtml = finalText.replace(/<Image(.*?)>/g, "<Image$1 />");
-  return finalHtml;
 }

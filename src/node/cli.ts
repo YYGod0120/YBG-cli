@@ -1,5 +1,5 @@
 import { fileToJSON } from "../compile/extractMd";
-import { writeFile } from "../create/createPage";
+import { writeFile } from "../create/mdToPage";
 import cac from "cac";
 import { createEssay } from "../create/createMD";
 import { currentDate } from "../utils/time";

@@ -1,10 +1,14 @@
 import fs from "fs";
 import matter from "gray-matter";
 import { marked } from "marked";
+import rehypeStringify from "rehype-stringify";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import { unified } from "unified";
 import { UTCToString } from "../utils/time";
 import path from "path";
-import { basePath, processHTML } from "../locale/content";
-
+import { basePath } from "../constant/content";
+import { compileHTML } from "./HtmlToNext";
 const _postFolder = path.join(basePath, "/_posts");
 
 export type mdFile = {
@@ -24,7 +28,14 @@ export async function fileToJSON(): Promise<mdFile[]> {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
-    const htmlText = processHTML(await marked(parsedFile.content));
+    const htmlText = compileHTML(await marked(parsedFile.content));
+    const test = await unified()
+      .use(remarkParse)
+      .use(remarkRehype)
+      .use(rehypeStringify)
+      .process(parsedFile.content);
+    console.log(test);
+
     console.log(file);
 
     files.push({ mdMatter: newMatter, mdHtml: htmlText });
