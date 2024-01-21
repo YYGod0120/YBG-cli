@@ -66,7 +66,7 @@ export async function makeEssayPage(file: mdFile) {
           <span className=" text-[#86909C] px-24 pt-5 text-xl mb-5">
             Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
           </span>
-          <div className="flex text-start flex-col pb-12 px-24">
+          <div className="flex text-start flex-col pb-12 px-24 w-[50vw]">
           ${file.mdHtml}
           </div>
           </div>

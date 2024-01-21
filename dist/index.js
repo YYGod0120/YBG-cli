@@ -79,7 +79,7 @@ async function makeEssayPage(file) {
           <span className=" text-[#86909C] px-24 pt-5 text-xl mb-5">
             Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
           </span>
-          <div className="flex text-start flex-col pb-12 px-24">
+          <div className="flex text-start flex-col pb-12 px-24 w-[50vw]">
           ${file.mdHtml}
           </div>
           </div>
@@ -90,6 +90,7 @@ async function makeEssayPage(file) {
 }
 
 // src/compile/HtmlToNext.ts
+import he from "he";
 function ImageRepimg(html) {
   const processedHtml = html.replace(
     /<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g,
@@ -102,22 +103,22 @@ function replaceClassName(html) {
   return processedHtml;
 }
 function highLightHtml(html) {
-  const replacedString1 = html.replace(/&quot;/g, '"');
-  const replacedString2 = replacedString1.replace(
+  const replacedString1 = html.replace(
     /<pre><code className="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
     (_, language, codeContent) => {
-      const codeWithBackslash = codeContent.replace(/([^\w\s"'])/g, "\\$1");
+      const decodeCode = he.decode(codeContent);
+      const codeWithBackslash = decodeCode.replace(/([^\w\s"'])/g, "\\$1");
       return `<SyntaxHighlighter language="${language}" style={oneLight} showLineNumbers>{ \`${codeWithBackslash}\` }</SyntaxHighlighter>`;
     }
   );
-  return replacedString2;
+  return replacedString1;
 }
 function compileHTML(html) {
   const step1Html = ImageRepimg(html);
   const step2Html = replaceClassName(step1Html);
   const step3Html = highLightHtml(step2Html);
-  console.log(1);
-  return step3Html;
+  const step4Html = step3Html.replace(/<hr>/g, "<hr />");
+  return step4Html;
 }
 
 // src/compile/extractMd.ts

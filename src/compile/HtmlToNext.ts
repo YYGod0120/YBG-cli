@@ -1,3 +1,4 @@
+import he from "he";
 function ImageRepimg(html: string) {
   const processedHtml = html.replace(
     /<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g,
@@ -10,17 +11,20 @@ function replaceClassName(html: string) {
   return processedHtml;
 }
 function highLightHtml(html: string) {
-  const replacedString1 = html.replace(/&quot;/g, '"');
   // 在代码块内的特殊字符前加上 \
-  const replacedString2 = replacedString1.replace(
+  const replacedString1 = html.replace(
     /<pre><code className="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
     (_, language, codeContent) => {
-      const codeWithBackslash = codeContent.replace(/([^\w\s"'])/g, "\\$1");
+      //转义符删除
+      const decodeCode = he.decode(codeContent);
+
+      const codeWithBackslash = decodeCode.replace(/([^\w\s"'])/g, "\\$1");
+
       return `<SyntaxHighlighter language="${language}" style={oneLight} showLineNumbers>{ \`${codeWithBackslash}\` }</SyntaxHighlighter>`;
     }
   );
 
-  return replacedString2;
+  return replacedString1;
 }
 export function compileHTML(html: string) {
   //替换img标签
@@ -30,7 +34,8 @@ export function compileHTML(html: string) {
   const step2Html = replaceClassName(step1Html);
   //高亮代码
   const step3Html = highLightHtml(step2Html);
-  console.log(1);
+  //闭合分割线
+  const step4Html = step3Html.replace(/<hr>/g, "<hr />");
 
-  return step3Html;
+  return step4Html;
 }
