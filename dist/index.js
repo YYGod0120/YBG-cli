@@ -135,7 +135,6 @@ async function fileToJSON() {
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
     const htmlText = compileHTML(await marked(parsedFile.content));
-    console.log(file);
     files.push({ mdMatter: newMatter, mdHtml: htmlText });
   }
   return files;
@@ -254,11 +253,60 @@ function removePage(file) {
   rimraf(foldPath, { preserveRoot: false });
 }
 
+// src/create/createFileData.ts
+import path7 from "path";
+import fs7 from "fs";
+
+// src/utils/transformType.ts
+function transformType(files) {
+  let newDate = [];
+  files.forEach((file, index) => {
+    const { mdMatter, mdHtml } = file;
+    const { data } = mdMatter;
+    const newMatter = {
+      ...data,
+      html: mdHtml,
+      id: index + 1 + ""
+    };
+    newDate.push(newMatter);
+  });
+  return newDate;
+}
+
+// src/create/createFileData.ts
+function writeFileData() {
+  const fileDataPath = path7.join(`${basePath}/app/lib/`, "fileData.js");
+  const fileDataFolderPath = `${basePath}/app/lib/`;
+  fs7.mkdir(fileDataFolderPath, { recursive: true }, async (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      const fileData = transformType(await fileToJSON());
+      fs7.writeFile(
+        fileDataPath,
+        `const data = ${JSON.stringify(fileData)} 
+        module.exports = {
+            data,
+          };
+          `,
+        (err) => {
+          if (err) {
+            console.error("Error creating file:", err);
+          }
+        }
+      );
+    }
+  });
+}
+
 // src/node/cli.ts
 var cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await fileToJSON();
   writeFile(files);
+});
+cli.command("upload", "createAndUpdate").action(() => {
+  writeFileData();
 });
 cli.command("create [project]", "create the new essay").action(async (project) => {
   createEssay(currentDate, project);

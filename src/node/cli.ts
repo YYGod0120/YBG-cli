@@ -5,10 +5,14 @@ import { createEssay } from "../create/createMD";
 import { currentDate } from "../utils/time";
 import { createImgs } from "../create/createImg";
 import { removePage } from "../remove/removePage";
+import { writeFileData } from "../create/createFileData";
 const cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await fileToJSON();
   writeFile(files);
+});
+cli.command("upload", "createAndUpdate").action(() => {
+  writeFileData();
 });
 cli
   .command("create [project]", "create the new essay")

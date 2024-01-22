@@ -17,9 +17,7 @@ function highLightHtml(html: string) {
     (_, language, codeContent) => {
       //转义符删除
       const decodeCode = he.decode(codeContent);
-
       const codeWithBackslash = decodeCode.replace(/([^\w\s"'])/g, "\\$1");
-
       return `<SyntaxHighlighter language="${language}" style={oneLight} showLineNumbers>{ \`${codeWithBackslash}\` }</SyntaxHighlighter>`;
     }
   );

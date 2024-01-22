@@ -26,11 +26,7 @@ export async function fileToJSON(): Promise<mdFile[]> {
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
     const htmlText = compileHTML(await marked(parsedFile.content));
-
-    console.log(file);
-
     files.push({ mdMatter: newMatter, mdHtml: htmlText });
   }
-
   return files;
 }
