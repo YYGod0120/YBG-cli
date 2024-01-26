@@ -72,14 +72,14 @@ async function makeEssayPage(file) {
     import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
     export default function Page() {
       return (
-        <div className=" mt-8 bg-white w-[60vw] flex flex-col items-start text-lg">
+        <div className=" mt-8 bg-white w-[50vw] flex flex-col items-start text-lg">
           <span className="text-4xl text-left px-24 pt-12 text-visit-font font-bold">
             ${file.mdMatter.data.title}
           </span>
           <span className=" text-[#86909C] px-24 pt-5 text-xl mb-5">
             Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
           </span>
-          <div className="flex text-start flex-col pb-12 px-24 w-[50vw]">
+          <div className="flex text-start flex-col pb-12 px-24 w-[40vw]">
           ${file.mdHtml}
           </div>
           </div>
