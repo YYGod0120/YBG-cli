@@ -2,7 +2,21 @@ import he from "he";
 function ImageRepimg(html: string) {
   const processedHtml = html.replace(
     /<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g,
-    '<Image src="$1" alt="$2" width="700" height="450" />'
+    function (match, src, alt) {
+      const modifiedSrc = src.split("/");
+      const newSrc = modifiedSrc[modifiedSrc.length - 1]; // Your modification logic for src
+      const modifiedAlt = alt; // Your modification logic for alt
+
+      return `<Image src={${newSrc.slice(
+        0,
+        newSrc.lastIndexOf(".")
+      )}} alt="${modifiedAlt}" 
+      sizes="100vw"
+      style={{
+        width: '100%',
+        height: 'auto',
+      }} />`;
+    }
   );
   return processedHtml;
 }

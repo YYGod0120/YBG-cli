@@ -63,30 +63,43 @@ excerpt:
   return content;
 }
 async function makeEssayPage(file) {
-  const template = `
-    import "../../essay.css";
-    import Image from "next/image";
-    // @ts-ignore
-      import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-    // @ts-ignore
-    import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-    export default function Page() {
-      return (
-        <div className="mt-8 bg-white flex flex-col items-start text-lg shadow-lg rounded-sm">
-          <span className="text-4xl text-left lg:px-20 md:px-[2.5vw] px-4 pt-12 text-visit-font font-bold">
-            ${file.mdMatter.data.title}
-          </span>
-          <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
-            Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
-          </span>
-          <div className="flex text-start flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
-          ${file.mdHtml}
-          </div>
-          </div>
-        );
-      }
-    `;
-  return template;
+  let imgImport = "";
+  const fileImgs = file.mdHtml.match(
+    /<Image\s+src\s*=\s*{?([^\s{}]+)}?\s+alt\s*=\s*{?([^\s{}]+)}?[^>]*>/g
+  );
+  const importStatements = fileImgs?.map((img, index) => {
+    const [, srcValue] = img.match(/src\s*=\s*{?([^\s{}]+)}?/) || [];
+    console.log("src:", srcValue);
+    return `// @ts-ignore
+import ${srcValue} from "../../../../public/imgs/${file.mdMatter.data.title}/${srcValue}.JPG";`;
+  });
+  if (importStatements) {
+    imgImport += importStatements.join("\n");
+  }
+  let template = `
+import "../../essay.css";
+import Image from "next/image";
+// @ts-ignore
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+// @ts-ignore
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+export default function Page() {
+  return (
+    <div className="mt-8 bg-white flex flex-col items-start text-lg shadow-lg rounded-sm">
+      <span className="text-4xl text-left lg:px-20 md:px-[2.5vw] px-4 pt-12 text-visit-font font-bold">
+        ${file.mdMatter.data.title}
+      </span>
+      <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
+        Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
+      </span>
+      <div className="flex text-start flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
+        ${file.mdHtml}
+      </div>
+    </div>
+  );
+}`;
+  return imgImport + template;
 }
 
 // src/compile/HtmlToNext.ts
@@ -94,7 +107,20 @@ import he from "he";
 function ImageRepimg(html) {
   const processedHtml = html.replace(
     /<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g,
-    '<Image src="$1" alt="$2" width="700" height="450" />'
+    function(match, src, alt) {
+      const modifiedSrc = src.split("/");
+      const newSrc = modifiedSrc[modifiedSrc.length - 1];
+      const modifiedAlt = alt;
+      return `<Image src={${newSrc.slice(
+        0,
+        newSrc.lastIndexOf(".")
+      )}} alt="${modifiedAlt}" 
+      sizes="100vw"
+      style={{
+        width: '100%',
+        height: 'auto',
+      }} />`;
+    }
   );
   return processedHtml;
 }
