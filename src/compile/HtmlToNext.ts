@@ -5,6 +5,7 @@ function ImageRepimg(html: string) {
     function (match, src, alt) {
       const modifiedSrc = src.split("/");
       const newSrc = modifiedSrc[modifiedSrc.length - 1]; // Your modification logic for src
+
       const modifiedAlt = alt; // Your modification logic for alt
 
       return `<Image src={${newSrc.slice(

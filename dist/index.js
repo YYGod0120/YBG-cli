@@ -62,28 +62,34 @@ excerpt:
     `;
   return content;
 }
-async function makeEssayPage(file) {
+function makeImportPic(html) {
   let imgImport = "";
-  const fileImgs = file.mdHtml.match(
-    /<Image\s+src\s*=\s*{?([^\s{}]+)}?\s+alt\s*=\s*{?([^\s{}]+)}?[^>]*>/g
-  );
+  const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g);
   const importStatements = fileImgs?.map((img, index) => {
-    const [, srcValue] = img.match(/src\s*=\s*{?([^\s{}]+)}?/) || [];
-    console.log("src:", srcValue);
-    return `// @ts-ignore
-import ${srcValue} from "../../../../public/imgs/${file.mdMatter.data.title}/${srcValue}.JPG";`;
+    const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
+    const oneSrc = srcValues.split("/");
+    const src = oneSrc[oneSrc.length - 1];
+    console.log("src:", srcValues);
+    return `//@ts-ignore
+import ${src.slice(
+      0,
+      src.lastIndexOf(".")
+    )} from "../../../../public${srcValues}"`;
   });
   if (importStatements) {
     imgImport += importStatements.join("\n");
   }
+  return imgImport;
+}
+async function makeEssayPage(file) {
   let template = `
+  ${file.picPath}
 import "../../essay.css";
 import Image from "next/image";
 // @ts-ignore
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-
 export default function Page() {
   return (
     <div className="mt-8 bg-white flex flex-col items-start text-lg shadow-lg rounded-sm">
@@ -99,7 +105,7 @@ export default function Page() {
     </div>
   );
 }`;
-  return imgImport + template;
+  return template;
 }
 
 // src/compile/HtmlToNext.ts
@@ -160,8 +166,13 @@ async function fileToJSON() {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
+    const picPath = makeImportPic(await marked(parsedFile.content));
     const htmlText = compileHTML(await marked(parsedFile.content));
-    files.push({ mdMatter: newMatter, mdHtml: htmlText });
+    files.push({
+      mdMatter: newMatter,
+      mdHtml: htmlText,
+      picPath
+    });
   }
   return files;
 }

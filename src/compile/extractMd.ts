@@ -4,19 +4,19 @@ import { marked } from "marked";
 
 import { UTCToString } from "../utils/time";
 import path from "path";
-import { basePath } from "../constant/content";
+import { basePath, makeImportPic } from "../constant/content";
 import { compileHTML } from "./HtmlToNext";
 const _postFolder = path.join(basePath, "/_posts");
 
 export type mdFile = {
   mdMatter: matter.GrayMatterFile<string>;
   mdHtml: string;
+  picPath: string;
 };
 
 export async function fileToJSON(): Promise<mdFile[]> {
   let files: mdFile[] = [];
   const fileList = fs.readdirSync(_postFolder);
-
   for (const file of fileList) {
     const filePath = path.join(_postFolder, file);
     const fileContent = fs.readFileSync(filePath, "utf-8");
@@ -25,8 +25,13 @@ export async function fileToJSON(): Promise<mdFile[]> {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
+    const picPath = makeImportPic(await marked(parsedFile.content));
     const htmlText = compileHTML(await marked(parsedFile.content));
-    files.push({ mdMatter: newMatter, mdHtml: htmlText });
+    files.push({
+      mdMatter: newMatter,
+      mdHtml: htmlText,
+      picPath: picPath,
+    });
   }
   return files;
 }
