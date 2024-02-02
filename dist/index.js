@@ -69,7 +69,6 @@ function makeImportPic(html) {
     const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
     const oneSrc = srcValues.split("/");
     const src = oneSrc[oneSrc.length - 1];
-    console.log("src:", srcValues);
     return `//@ts-ignore
 import ${src.slice(
       0,
