@@ -3,4 +3,7 @@ public/
 _posts/
 app/
 out/
+src/
+tsup.config.ts
+package.json
 .vscode

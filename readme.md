@@ -1,4 +1,4 @@
-# 便捷自用博客命令
+# CLI 命令
 
 ## ybg compile
 

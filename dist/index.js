@@ -350,8 +350,6 @@ var cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await fileToJSON();
   writeFile(files);
-});
-cli.command("upload", "createAndUpdate").action(() => {
   writeFileData();
 });
 cli.command("create [project]", "create the new essay").action(async (project) => {
