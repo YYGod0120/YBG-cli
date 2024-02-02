@@ -310,6 +310,16 @@ function transformType(files) {
   return newDate;
 }
 
+// src/utils/sortByDate.ts
+function sortByDate(array) {
+  array.sort(function(a, b) {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateA - dateB;
+  });
+  return array;
+}
+
 // src/create/createFileData.ts
 function writeFileData() {
   const fileDataPath = path7.join(`${basePath}/app/lib/`, "fileData.js");
@@ -318,7 +328,7 @@ function writeFileData() {
     if (error) {
       console.log(error);
     } else {
-      const fileData = transformType(await fileToJSON());
+      const fileData = sortByDate(transformType(await fileToJSON()));
       fs7.writeFile(
         fileDataPath,
         `const data = ${JSON.stringify(fileData)} 

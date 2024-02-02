@@ -3,6 +3,7 @@ import fs from "fs";
 import { basePath } from "../constant/content";
 import { fileToJSON } from "../compile/extractMd";
 import { transformType } from "../utils/transformType";
+import { sortByDate } from "../utils/sortByDate";
 export function writeFileData() {
   const fileDataPath = path.join(`${basePath}/app/lib/`, "fileData.js");
   const fileDataFolderPath = `${basePath}/app/lib/`;
@@ -10,7 +11,7 @@ export function writeFileData() {
     if (error) {
       console.log(error);
     } else {
-      const fileData = transformType(await fileToJSON());
+      const fileData = sortByDate(transformType(await fileToJSON()));
       fs.writeFile(
         fileDataPath,
         `const data = ${JSON.stringify(fileData)} 
