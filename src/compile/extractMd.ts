@@ -14,7 +14,7 @@ export type mdFile = {
   picPath: string;
 };
 
-export async function fileToJSON(): Promise<mdFile[]> {
+export async function compileFile(): Promise<mdFile[]> {
   let files: mdFile[] = [];
   const fileList = fs.readdirSync(_postFolder);
   for (const file of fileList) {

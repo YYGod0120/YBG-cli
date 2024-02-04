@@ -1,4 +1,4 @@
-import { fileToJSON } from "../compile/extractMd";
+import { compileFile } from "../compile/extractMd";
 import { writeFile } from "../create/mdToPage";
 import cac from "cac";
 import { createEssay } from "../create/createMD";
@@ -8,7 +8,7 @@ import { removePage } from "../remove/removePage";
 import { writeFileData } from "../create/createFileData";
 const cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
-  const files = await fileToJSON();
+  const files = await compileFile();
   writeFile(files);
   writeFileData();
 });
