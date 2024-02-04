@@ -39,16 +39,14 @@ function highLightHtml(html: string) {
 
   return replacedString1;
 }
-export function compileHTML(html: string) {
+export function HtmlToNext(html: string) {
   //替换img标签
   const step1Html = ImageRepimg(html);
-
   //替换class为className
   const step2Html = replaceClassName(step1Html);
   //高亮代码
   const step3Html = highLightHtml(step2Html);
   //闭合分割线
   const step4Html = step3Html.replace(/<hr>/g, "<hr />");
-
   return step4Html;
 }

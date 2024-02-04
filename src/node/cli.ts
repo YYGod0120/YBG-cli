@@ -1,5 +1,5 @@
 import { compileFile } from "../compile/extractMd";
-import { writeFile } from "../create/mdToPage";
+import { writeFile } from "../create/writeFiles";
 import cac from "cac";
 import { createEssay } from "../create/createMD";
 import { currentDate } from "../utils/time";

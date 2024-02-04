@@ -1,21 +1,22 @@
 import fs from "fs";
 import matter from "gray-matter";
 import { marked } from "marked";
-
 import { UTCToString } from "../utils/time";
 import path from "path";
 import { basePath, makeImportPic } from "../constant/content";
-import { compileHTML } from "./HtmlToNext";
+import { HtmlToNext } from "./HtmlToNext";
 const _postFolder = path.join(basePath, "/_posts");
 
 export type mdFile = {
   mdMatter: matter.GrayMatterFile<string>;
   mdHtml: string;
-  picPath: string;
+  other?: {
+    picPath: string;
+  };
 };
 
 export async function compileFile(): Promise<mdFile[]> {
-  let files: mdFile[] = [];
+  let compiledFiles: mdFile[] = [];
   const fileList = fs.readdirSync(_postFolder);
   for (const file of fileList) {
     const filePath = path.join(_postFolder, file);
@@ -26,12 +27,18 @@ export async function compileFile(): Promise<mdFile[]> {
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
     const picPath = makeImportPic(await marked(parsedFile.content));
-    const htmlText = compileHTML(await marked(parsedFile.content));
-    files.push({
-      mdMatter: newMatter,
-      mdHtml: htmlText,
-      picPath: picPath,
-    });
+    const htmlText = HtmlToNext(await marked(parsedFile.content));
+    compiledFiles.push(
+      picPath
+        ? {
+            mdMatter: newMatter,
+            mdHtml: htmlText,
+            other: {
+              picPath: picPath,
+            },
+          }
+        : { mdMatter: newMatter, mdHtml: htmlText }
+    );
   }
-  return files;
+  return compiledFiles;
 }

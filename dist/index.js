@@ -82,7 +82,7 @@ import ${src.slice(
 }
 async function makeEssayPage(file) {
   let template = `
-  ${file.picPath}
+  ${file.other ? file.other.picPath : ""}
 import "../../essay.css";
 import Image from "next/image";
 // @ts-ignore
@@ -144,7 +144,7 @@ function highLightHtml(html) {
   );
   return replacedString1;
 }
-function compileHTML(html) {
+function HtmlToNext(html) {
   const step1Html = ImageRepimg(html);
   const step2Html = replaceClassName(step1Html);
   const step3Html = highLightHtml(step2Html);
@@ -154,8 +154,8 @@ function compileHTML(html) {
 
 // src/compile/extractMd.ts
 var _postFolder = path2.join(basePath, "/_posts");
-async function fileToJSON() {
-  let files = [];
+async function compileFile() {
+  let compiledFiles = [];
   const fileList = fs.readdirSync(_postFolder);
   for (const file of fileList) {
     const filePath = path2.join(_postFolder, file);
@@ -166,17 +166,21 @@ async function fileToJSON() {
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
     const picPath = makeImportPic(await marked(parsedFile.content));
-    const htmlText = compileHTML(await marked(parsedFile.content));
-    files.push({
-      mdMatter: newMatter,
-      mdHtml: htmlText,
-      picPath
-    });
+    const htmlText = HtmlToNext(await marked(parsedFile.content));
+    compiledFiles.push(
+      picPath ? {
+        mdMatter: newMatter,
+        mdHtml: htmlText,
+        other: {
+          picPath
+        }
+      } : { mdMatter: newMatter, mdHtml: htmlText }
+    );
   }
-  return files;
+  return compiledFiles;
 }
 
-// src/create/mdToPage.ts
+// src/create/writeFiles.ts
 import path4 from "path";
 import fs3 from "fs";
 
@@ -195,7 +199,7 @@ function writeCSS() {
   });
 }
 
-// src/create/mdToPage.ts
+// src/create/writeFiles.ts
 import { rimrafSync } from "rimraf";
 
 // src/utils/randomColor.ts
@@ -207,7 +211,7 @@ function getRandomColor(string) {
   return colors[randomIndex](string);
 }
 
-// src/create/mdToPage.ts
+// src/create/writeFiles.ts
 function writeFile(files) {
   rimrafSync(`${basePath}/app/essay`, {
     preserveRoot: false
@@ -314,7 +318,7 @@ function sortByDate(array) {
   array.sort(function(a, b) {
     const dateA = new Date(a.date).getTime();
     const dateB = new Date(b.date).getTime();
-    return dateA - dateB;
+    return dateB - dateA;
   });
   return array;
 }
@@ -327,7 +331,7 @@ function writeFileData() {
     if (error) {
       console.log(error);
     } else {
-      const fileData = sortByDate(transformType(await fileToJSON()));
+      const fileData = sortByDate(transformType(await compileFile()));
       fs7.writeFile(
         fileDataPath,
         `const data = ${JSON.stringify(fileData)} 
@@ -348,7 +352,7 @@ function writeFileData() {
 // src/node/cli.ts
 var cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
-  const files = await fileToJSON();
+  const files = await compileFile();
   writeFile(files);
   writeFileData();
 });

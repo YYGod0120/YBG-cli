@@ -72,7 +72,7 @@ export function makeImportPic(html: string) {
 }
 export async function makeEssayPage(file: mdFile) {
   let template = `
-  ${file.picPath}
+  ${file.other ? file.other.picPath : ""}
 import "../../essay.css";
 import Image from "next/image";
 // @ts-ignore
@@ -86,7 +86,9 @@ export default function Page() {
         ${file.mdMatter.data.title}
       </span>
       <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
-        Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
+        Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${
+    file.mdMatter.data.date
+  }
       </span>
       <div className="flex text-start flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
         ${file.mdHtml}

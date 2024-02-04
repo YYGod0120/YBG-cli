@@ -6,7 +6,7 @@ export function sortByDate(array: { [x: string]: string }[]) {
     const dateB = new Date(b.date).getTime();
 
     // 返回比较的结果
-    return dateA - dateB;
+    return dateB - dateA;
   });
 
   // 返回排序后的数组
