@@ -86,19 +86,24 @@ export default function Page() {
     ssr: false,
   });
   return (
+    <div>
     <div className="mt-8 bg-white flex flex-col items-start text-lg shadow-lg rounded-sm">
-      <span className="text-4xl text-left lg:px-20 md:px-[2.5vw] px-4 pt-12 text-visit-font font-bold">
-        ${file.mdMatter.data.title}
-      </span>
-      <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
-        Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${
+    <span className="text-4xl text-left lg:px-20 md:px-[2.5vw] px-4 pt-12 text-visit-font font-bold">
+      ${file.mdMatter.data.title}
+    </span>
+    <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
+      Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${
     file.mdMatter.data.date
   }
-      </span>
-      <div className="flex text-start flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
-        ${file.mdHtml}
-      </div>
-      <Comment />
+    </span>
+    <div className="flex text-start flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
+      ${file.mdHtml}
+    </div>
+    
+  </div>
+  <div className="mt-12 py-8 bg-white px-6">
+  <Comment />
+</div>
     </div>
   );
 }`;
