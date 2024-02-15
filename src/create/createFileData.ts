@@ -14,9 +14,9 @@ export function writeFileData() {
       const fileData = sortByDate(transformType(await compileFile()));
       fs.writeFile(
         fileDataPath,
-        `const data = ${JSON.stringify(fileData)} 
+        `const DATA = ${JSON.stringify(fileData)} 
         module.exports = {
-            data,
+            DATA,
           };
           `,
         (err) => {

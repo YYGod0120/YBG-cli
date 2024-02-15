@@ -16,7 +16,7 @@ import path2 from "path";
 // src/constant/content.ts
 import path from "path";
 var basePath = path.join(process.cwd(), "./");
-var essayCss = `
+var ESSAYCSS = `
 blockquote {
   margin-left: 0;
   border-left: 4px solid #bac2cb;
@@ -63,7 +63,7 @@ excerpt:
   return content;
 }
 function makeImportPic(html) {
-  let imgImport = "";
+  let IMGIMPORT = "";
   const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g);
   const importStatements = fileImgs?.map((img, index) => {
     const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
@@ -76,21 +76,20 @@ import ${src.slice(
     )} from "../../../../public${srcValues}"`;
   });
   if (importStatements) {
-    imgImport += importStatements.join("\n");
+    IMGIMPORT += importStatements.join("\n");
   }
-  return imgImport;
+  return IMGIMPORT;
 }
 async function makeEssayPage(file) {
-  let template = `
-  ${file.other ? file.other.picPath : ""}
-import "../../essay.css";
-import Image from "next/image";
+  let TEMPLATE = `
+  import Image from "next/image";
 import dynamic from "next/dynamic";
-
-// @ts-ignore
+  ${file.other ? file.other.picPath : ""}
+  // @ts-ignore
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import "@/app/essay/essay.css";
 export default function Page() {
   const Comment = dynamic(() => import("@/components/Comment"), {
     ssr: false,
@@ -115,7 +114,7 @@ export default function Page() {
     </div>
   );
 }`;
-  return template;
+  return TEMPLATE;
 }
 
 // src/compile/HtmlToNext.ts
@@ -202,7 +201,7 @@ function writeCSS() {
   const filePath = path3.join(basePath, "/app/essay/essay.css");
   fs2.access(filePath, fs2.constants.F_OK, (err) => {
     if (err) {
-      fs2.writeFile(filePath, essayCss, (writeErr) => {
+      fs2.writeFile(filePath, ESSAYCSS, (writeErr) => {
         if (writeErr)
           throw writeErr;
       });
@@ -345,9 +344,9 @@ function writeFileData() {
       const fileData = sortByDate(transformType(await compileFile()));
       fs7.writeFile(
         fileDataPath,
-        `const data = ${JSON.stringify(fileData)} 
+        `const DATA = ${JSON.stringify(fileData)} 
         module.exports = {
-            data,
+            DATA,
           };
           `,
         (err) => {

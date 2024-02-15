@@ -1,7 +1,7 @@
 import path from "path";
 import { mdFile } from "../compile/extractMd";
 export const basePath = path.join(process.cwd(), "./");
-export const essayCss = `
+export const ESSAYCSS = `
 blockquote {
   margin-left: 0;
   border-left: 4px solid #bac2cb;
@@ -49,7 +49,7 @@ excerpt:
   return content;
 }
 export function makeImportPic(html: string) {
-  let imgImport = "";
+  let IMGIMPORT = "";
   const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g);
   const importStatements = fileImgs?.map((img, index) => {
     const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
@@ -66,21 +66,20 @@ export function makeImportPic(html: string) {
   });
 
   if (importStatements) {
-    imgImport += importStatements.join("\n");
+    IMGIMPORT += importStatements.join("\n");
   }
-  return imgImport;
+  return IMGIMPORT;
 }
 export async function makeEssayPage(file: mdFile) {
-  let template = `
-  ${file.other ? file.other.picPath : ""}
-import "../../essay.css";
-import Image from "next/image";
+  let TEMPLATE = `
+  import Image from "next/image";
 import dynamic from "next/dynamic";
-
-// @ts-ignore
+  ${file.other ? file.other.picPath : ""}
+  // @ts-ignore
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import "@/app/essay/essay.css";
 export default function Page() {
   const Comment = dynamic(() => import("@/components/Comment"), {
     ssr: false,
@@ -108,5 +107,5 @@ export default function Page() {
   );
 }`;
 
-  return template;
+  return TEMPLATE;
 }
