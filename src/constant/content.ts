@@ -58,10 +58,7 @@ export function makeImportPic(html: string) {
     return (
       `//@ts-ignore` +
       "\n" +
-      `import ${src.slice(
-        0,
-        src.lastIndexOf(".")
-      )} from "../../../../public${srcValues}"`
+      `import ${src.slice(0, src.lastIndexOf("."))} from "@/public${srcValues}"`
     );
   });
 
@@ -79,9 +76,9 @@ import dynamic from "next/dynamic";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import "@/app/essay/essay.css";
+import "@/app/[language]/essay/essay.css";
 export default function Page() {
-  const Comment = dynamic(() => import("@/components/Comment"), {
+  const Comment = dynamic(() => import("@/app/[language]/components/Comment"), {
     ssr: false,
   });
   return (

@@ -70,10 +70,7 @@ function makeImportPic(html) {
     const oneSrc = srcValues.split("/");
     const src = oneSrc[oneSrc.length - 1];
     return `//@ts-ignore
-import ${src.slice(
-      0,
-      src.lastIndexOf(".")
-    )} from "../../../../public${srcValues}"`;
+import ${src.slice(0, src.lastIndexOf("."))} from "@/public${srcValues}"`;
   });
   if (importStatements) {
     IMGIMPORT += importStatements.join("\n");
@@ -89,9 +86,9 @@ import dynamic from "next/dynamic";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import "@/app/essay/essay.css";
+import "@/app/[language]/essay/essay.css";
 export default function Page() {
-  const Comment = dynamic(() => import("@/components/Comment"), {
+  const Comment = dynamic(() => import("@/app/[language]/components/Comment"), {
     ssr: false,
   });
   return (
@@ -198,7 +195,7 @@ import fs3 from "fs";
 import path3 from "path";
 import fs2 from "fs";
 function writeCSS() {
-  const filePath = path3.join(basePath, "/app/essay/essay.css");
+  const filePath = path3.join(basePath, "/app/[language]/essay/essay.css");
   fs2.access(filePath, fs2.constants.F_OK, (err) => {
     if (err) {
       fs2.writeFile(filePath, ESSAYCSS, (writeErr) => {
@@ -227,7 +224,7 @@ function writeFile(files) {
     preserveRoot: false
   });
   files.forEach(async (file, index) => {
-    const foldPath = `${basePath}/app/essay/${file.mdMatter.data.date}/${index + 1}`;
+    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${index + 1}`;
     const filePath = path4.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
     fs3.mkdir(foldPath, { recursive: true }, (error) => {
@@ -335,8 +332,11 @@ function sortByDate(array) {
 
 // src/create/createFileData.ts
 function writeFileData() {
-  const fileDataPath = path7.join(`${basePath}/app/lib/`, "fileData.js");
-  const fileDataFolderPath = `${basePath}/app/lib/`;
+  const fileDataPath = path7.join(
+    `${basePath}/app/[language]/lib/`,
+    "fileData.js"
+  );
+  const fileDataFolderPath = `${basePath}/app/[language]/lib/`;
   fs7.mkdir(fileDataFolderPath, { recursive: true }, async (error) => {
     if (error) {
       console.log(error);

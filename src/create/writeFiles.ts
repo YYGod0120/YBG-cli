@@ -11,9 +11,9 @@ export function writeFile(files: mdFile[]) {
     preserveRoot: false,
   });
   files.forEach(async (file, index) => {
-    const foldPath = `${basePath}/app/essay/${file.mdMatter.data.date}/${
-      index + 1
-    }`;
+    const foldPath = `${basePath}/app/[language]/essay/${
+      file.mdMatter.data.date
+    }/${index + 1}`;
     const filePath = path.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
 
