@@ -31,7 +31,7 @@ h6 {
   margin-top: 30px;
   margin-bottom: 10px;
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 6px;
 }
 a:hover{
   color:#0c7ad8
