@@ -65,7 +65,7 @@ excerpt:
 function makeImportPic(html) {
   let IMGIMPORT = "";
   const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g);
-  const importStatements = fileImgs?.map((img, index) => {
+  const importStatements = fileImgs?.map((img, index2) => {
     const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
     const oneSrc = srcValues.split("/");
     const src = oneSrc[oneSrc.length - 1];
@@ -223,8 +223,8 @@ function writeFile(files) {
   rimrafSync(`${basePath}/app/[language]/essay`, {
     preserveRoot: false
   });
-  files.forEach(async (file, index) => {
-    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${index + 1}`;
+  files.forEach(async (file, index2) => {
+    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${index2 + 1}`;
     const filePath = path4.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
     fs3.mkdir(foldPath, { recursive: true }, (error) => {
@@ -307,13 +307,13 @@ import fs7 from "fs";
 // src/utils/transformType.ts
 function transformType(files) {
   let newDate = [];
-  files.forEach((file, index) => {
+  files.forEach((file, index2) => {
     const { mdMatter, mdHtml } = file;
     const { data } = mdMatter;
     const newMatter = {
       ...data,
       html: mdHtml,
-      id: index + 1 + ""
+      id: index2 + 1 + ""
     };
     newDate.push(newMatter);
   });
@@ -359,6 +359,88 @@ function writeFileData() {
   });
 }
 
+// src/deploy/index.ts
+import fs9 from "fs";
+import path9 from "path";
+import { spawn } from "child_process";
+
+// src/utils/readConfig.ts
+import fs8 from "fs";
+import path8 from "path";
+function readConfig() {
+  const jsonFilePath = path8.join(basePath, "_blog.json");
+  return new Promise((resolve, reject) => {
+    fs8.readFile(jsonFilePath, "utf8", (err, data) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      try {
+        const jsonData = JSON.parse(data);
+        resolve(jsonData);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
+// src/deploy/index.ts
+var currentDir = process.cwd();
+var gitFolderPath = path9.join(currentDir, ".git");
+function git(...args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("git", args, { cwd: currentDir });
+    child.stdout.on("data", (data) => {
+      console.log(data.toString());
+    });
+    child.stderr.on("data", (data) => {
+      console.error(data.toString());
+    });
+    child.on("exit", (code) => {
+      if (code === 0) {
+        resolve("over");
+      } else {
+        reject();
+      }
+    });
+  });
+}
+async function init() {
+  const json = await readConfig();
+  const { deployCon } = json;
+  fs9.rm(gitFolderPath, { recursive: true, force: true }, (err) => {
+    if (err) {
+      console.error("\u5220\u9664 .git \u6587\u4EF6\u5939\u65F6\u51FA\u9519\uFF1A", err);
+      return;
+    }
+    git("init", "-b", `main`).then(() => {
+      console.log("init over");
+      git(
+        "remote",
+        "add",
+        `${deployCon.remote_store_name}`,
+        `${deployCon.remote_store_url}`
+      ).then(() => {
+        git("add", ".").then(() => {
+          git("commit", "-m", "Initial commit").then(() => {
+          });
+        });
+      });
+    });
+  });
+  console.log(getRandomColor("please push to remote rep --force"));
+}
+async function index() {
+  const json = await readConfig();
+  const { deployCon } = json;
+  git("add", ".").then(() => {
+    git("commit", "-m", `${deployCon.commitMessage}`).then(() => {
+      git("push", `${deployCon.remote_store_name}`, `${deployCon.branch}`);
+    });
+  });
+}
+
 // src/node/cli.ts
 var cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
@@ -372,6 +454,12 @@ cli.command("create [project]", "create the new essay").action(async (project) =
 });
 cli.command("remove [project]", "remove the new essay").action(async (project) => {
   removePage(project);
+});
+cli.command("init", "for deploy").action(async () => {
+  init();
+});
+cli.command("deploy", "deploy the new essay").action(async () => {
+  index();
 });
 cli.parse();
 //# sourceMappingURL=index.js.map

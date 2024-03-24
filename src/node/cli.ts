@@ -6,6 +6,7 @@ import { currentDate } from "../utils/time";
 import { createImgs } from "../create/createImg";
 import { removePage } from "../remove/removePage";
 import { writeFileData } from "../create/createFileData";
+import { index, init } from "../deploy";
 const cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await compileFile();
@@ -23,5 +24,11 @@ cli
   .action(async (project) => {
     removePage(project);
   });
+cli.command("init", "for deploy").action(async () => {
+  init();
+});
+cli.command("deploy", "deploy the new essay").action(async () => {
+  index();
+});
 
 cli.parse();
