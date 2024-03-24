@@ -7,7 +7,7 @@ import { rimrafSync } from "rimraf";
 import { getRandomColor } from "../utils/randomColor";
 
 export function writeFile(files: mdFile[]) {
-  rimrafSync(`${basePath}/app/essay`, {
+  rimrafSync(`${basePath}/app/[language]/essay`, {
     preserveRoot: false,
   });
   files.forEach(async (file, index) => {

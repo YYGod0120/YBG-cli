@@ -220,7 +220,7 @@ function getRandomColor(string) {
 
 // src/create/writeFiles.ts
 function writeFile(files) {
-  rimrafSync(`${basePath}/app/essay`, {
+  rimrafSync(`${basePath}/app/[language]/essay`, {
     preserveRoot: false
   });
   files.forEach(async (file, index) => {
