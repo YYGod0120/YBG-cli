@@ -17,7 +17,16 @@ export function writeFileData() {
       const fileData = sortByDate(transformType(await compileFile()));
       fs.writeFile(
         fileDataPath,
-        `const DATA = ${JSON.stringify(fileData)} 
+        `/**
+        * @property {string} title - 文章标题
+        * @property {string} date - 文章日期
+        * @property {string} categories - 文章分类：Project,Weekly,Life,Technology
+        * @property {string} excerpt - 概述
+        * @property {string} html - 解析过后的html
+        * @property {string} id - id
+        * 
+        */
+        const DATA = ${JSON.stringify(fileData)} 
         module.exports = {
             DATA,
           };

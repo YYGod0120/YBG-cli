@@ -306,7 +306,7 @@ import fs7 from "fs";
 
 // src/utils/transformType.ts
 function transformType(files) {
-  let newDate = [];
+  let newData = [];
   files.forEach((file, index2) => {
     const { mdMatter, mdHtml } = file;
     const { data } = mdMatter;
@@ -315,9 +315,9 @@ function transformType(files) {
       html: mdHtml,
       id: index2 + 1 + ""
     };
-    newDate.push(newMatter);
+    newData.push(newMatter);
   });
-  return newDate;
+  return newData;
 }
 
 // src/utils/sortByDate.ts
@@ -344,7 +344,16 @@ function writeFileData() {
       const fileData = sortByDate(transformType(await compileFile()));
       fs7.writeFile(
         fileDataPath,
-        `const DATA = ${JSON.stringify(fileData)} 
+        `/**
+        * @property {string} title - \u6587\u7AE0\u6807\u9898
+        * @property {string} date - \u6587\u7AE0\u65E5\u671F
+        * @property {string} categories - \u6587\u7AE0\u5206\u7C7B\uFF1AProject,Weekly,Life,Technology
+        * @property {string} excerpt - \u6982\u8FF0
+        * @property {string} html - \u89E3\u6790\u8FC7\u540E\u7684html
+        * @property {string} id - id
+        * 
+        */
+        const DATA = ${JSON.stringify(fileData)} 
         module.exports = {
             DATA,
           };

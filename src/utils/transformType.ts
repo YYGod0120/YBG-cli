@@ -2,7 +2,7 @@ import { mdFile } from "../compile/extractMd";
 
 //解析类型
 export function transformType(files: mdFile[]) {
-  let newDate: { [x: string]: string }[] = [];
+  let newData: { [x: string]: string }[] = [];
   files.forEach((file, index) => {
     const { mdMatter, mdHtml } = file;
     const { data } = mdMatter;
@@ -11,9 +11,9 @@ export function transformType(files: mdFile[]) {
       html: mdHtml,
       id: index + 1 + "",
     };
-    newDate.push(newMatter);
+    newData.push(newMatter);
   });
-  return newDate;
+  return newData;
 }
 
 // //操作一下数据库
