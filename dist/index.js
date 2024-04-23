@@ -450,6 +450,30 @@ async function index() {
   });
 }
 
+// src/utils/translate.ts
+import crypto from "crypto";
+import "dotenv/config";
+console.log(process.env.APPID);
+var URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
+var APPID = process.env.APPID;
+var SIGN = process.env.SIGN;
+var salt = "yy";
+function utf8Encode(str) {
+  return Buffer.from(str, "utf-8").toString("hex");
+}
+function md5(appid, q, salt2, sign) {
+  const str1 = appid + q + salt2 + sign;
+  const md5Hash = crypto.createHash("md5").update(str1).digest("hex");
+  return md5Hash;
+}
+async function translateWord(q) {
+  const sign = md5(APPID, q, salt, SIGN);
+  const from = "zh";
+  const to = "en";
+  const searchWord = utf8Encode(q);
+  const finallyUrl = URL + `?q=${searchWord}&form=${from}&to=${to}&appid=${APPID}&salt=${salt}&sign=${sign}`;
+}
+
 // src/node/cli.ts
 var cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
@@ -469,6 +493,9 @@ cli.command("init", "for deploy").action(async () => {
 });
 cli.command("deploy", "deploy the new essay").action(async () => {
   index();
+});
+cli.command("t", "\u7FFB\u8BD1").action(async () => {
+  translateWord("\u6D4B\u8BD5\u4E00\u4E0B\uFF0C\u8FD9\u4E2A\u767E\u5EA6\u7FFB\u8BD1\u53EF\u4EE5\u4E0D");
 });
 cli.parse();
 //# sourceMappingURL=index.js.map

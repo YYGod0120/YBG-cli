@@ -4,3 +4,4 @@ _posts/
 app/
 out/
 .vscode
+.env

@@ -28,6 +28,8 @@ export async function compileFile(): Promise<mdFile[]> {
     };
     const picPath = makeImportPic(await marked(parsedFile.content));
     const htmlText = HtmlToNext(await marked(parsedFile.content));
+    //新增翻译
+
     compiledFiles.push(
       picPath
         ? {

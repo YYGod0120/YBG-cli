@@ -7,3 +7,4 @@ src/
 tsup.config.ts
 package.json
 .vscode
+.env

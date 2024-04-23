@@ -7,6 +7,7 @@ import { createImgs } from "../create/createImg";
 import { removePage } from "../remove/removePage";
 import { writeFileData } from "../create/createFileData";
 import { index, init } from "../deploy";
+import { translateWord } from "../utils/translate";
 const cli = cac();
 cli.command("compile", "mdToTsx").action(async () => {
   const files = await compileFile();
@@ -30,5 +31,7 @@ cli.command("init", "for deploy").action(async () => {
 cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
-
+cli.command("t", "翻译").action(async () => {
+  translateWord("测试一下，这个百度翻译可以不");
+});
 cli.parse();
