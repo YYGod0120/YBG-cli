@@ -6,31 +6,54 @@ console.log(process.env.APPID);
 const URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
 const APPID = process.env.APPID;
 const SIGN = process.env.SIGN;
-const salt = "yy";
+const salt = "1435660288";
+interface TranslateRep {
+  to: string;
+  from: string;
+  trans_result: { src: string; dst: string }[];
+}
 function utf8Encode(str: string): string {
-  return Buffer.from(str, "utf-8").toString("hex");
+  return Buffer.from(str, "utf-8").toString();
 }
-function md5(appid, q, salt, sign) {
-  const str1 = appid + q + salt + sign;
-  const md5Hash = crypto.createHash("md5").update(str1).digest("hex");
 
-  return md5Hash;
+function generateSignature(
+  appid: string,
+  q: string,
+  salt: string,
+  secretKey: string
+): string {
+  // 拼接字符串1
+  const str1 = `${appid}${q}${salt}${secretKey}`;
+  // 计算签名（MD5加密）
+  const sign = crypto.createHash("md5").update(str1, "utf8").digest("hex");
+
+  return sign;
 }
-export async function translateWord(q: string) {
-  const sign = md5(APPID, q, salt, SIGN);
-  const from = "zh";
-  const to = "en";
-  const searchWord = utf8Encode(q);
-  const finallyUrl =
-    URL +
-    `?q=${searchWord}` +
-    `&form=${from}` +
-    `&to=${to}` +
-    `&appid=${APPID}` +
-    `&salt=${salt}` +
-    `&sign=${sign}`;
-  //   console.log(APPID, SIGN);
+export async function translateWord(q: string): Promise<string> {
+  if (!APPID || !SIGN) {
+    throw new Error("no APPID or no SIGN");
+  } else {
+    const sign = generateSignature(APPID, q, salt, SIGN);
+    const from = "zh";
+    const to = "en";
+    const finallyUrl =
+      URL +
+      `?q=${utf8Encode(q)}` +
+      `&from=${from}` +
+      `&to=${to}` +
+      `&appid=${APPID}` +
+      `&salt=${salt}` +
+      `&sign=${sign}`;
 
-  //   const rep = await fetch(finallyUrl);
-  //   console.log(await rep.json());
+    const rep = await fetch(finallyUrl);
+    const data: TranslateRep = (await rep.json()) as TranslateRep;
+    console.log(data);
+    const res = data.trans_result.reduce((pre, nex) => {
+      return { src: pre.src + nex.src, dst: pre.dst + nex.dst };
+    });
+
+    console.log(res);
+
+    return res.dst;
+  }
 }

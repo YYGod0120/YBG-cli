@@ -23,7 +23,7 @@ function git(...args) {
     });
   });
 }
-// todo 自定义部署路径仓库以及初始化
+// * 自定义部署路径仓库以及初始化
 export async function init() {
   const json = await readConfig();
   const { deployCon } = json;

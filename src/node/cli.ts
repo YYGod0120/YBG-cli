@@ -9,11 +9,16 @@ import { writeFileData } from "../create/createFileData";
 import { index, init } from "../deploy";
 import { translateWord } from "../utils/translate";
 const cli = cac();
-cli.command("compile", "mdToTsx").action(async () => {
-  const files = await compileFile();
-  writeFile(files);
-  writeFileData();
-});
+cli
+  .command("compile [project]", "mdToTsx")
+  .option("-a, --all", "Compile all projects")
+  .action(async (project, options) => {
+    const { all } = options;
+    const files = all ? await compileFile() : await compileFile(project);
+
+    writeFile(files);
+    writeFileData();
+  });
 cli
   .command("create [project]", "create the new essay")
   .action(async (project) => {
@@ -32,6 +37,6 @@ cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
 cli.command("t", "翻译").action(async () => {
-  translateWord("测试一下，这个百度翻译可以不");
+  translateWord(`该怎么处理md文档咋办`);
 });
 cli.parse();

@@ -7,10 +7,13 @@ import { rimrafSync } from "rimraf";
 import { getRandomColor } from "../utils/randomColor";
 
 export function writeFile(files: mdFile[]) {
-  rimrafSync(`${basePath}/app/[language]/essay`, {
-    preserveRoot: false,
-  });
+  // rimrafSync(`${basePath}/app/[language]/essay`, {
+  //   preserveRoot: false,
+  // });
   files.forEach(async (file, index) => {
+    rimrafSync(`${basePath}/app/[language]/essay/${file.mdMatter.data.date}`, {
+      preserveRoot: false,
+    });
     const foldPath = `${basePath}/app/[language]/essay/${
       file.mdMatter.data.date
     }/${index + 1}`;

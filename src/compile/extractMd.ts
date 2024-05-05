@@ -5,31 +5,41 @@ import { UTCToString } from "../utils/time";
 import path from "path";
 import { basePath, makeImportPic } from "../constant/content";
 import { HtmlToNext } from "./HtmlToNext";
+import { translateWord } from "../utils/translate";
 const _postFolder = path.join(basePath, "/_posts");
 
 export type mdFile = {
   mdMatter: matter.GrayMatterFile<string>;
   mdHtml: string;
+  mdEnHtml?: string;
   other?: {
     picPath: string;
   };
 };
 
-export async function compileFile(): Promise<mdFile[]> {
+export async function compileFile(project?: string): Promise<mdFile[]> {
   let compiledFiles: mdFile[] = [];
-  const fileList = fs.readdirSync(_postFolder);
+  let fileList = fs.readdirSync(_postFolder);
+
+  if (project) {
+    fileList = fileList.filter((file) => {
+      return file === `${project}.md`;
+    });
+  }
   for (const file of fileList) {
     const filePath = path.join(_postFolder, file);
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const parsedFile = matter(fileContent);
+    // const enText = await translateWord(parsedFile.content);
     const newMatter = {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
     const picPath = makeImportPic(await marked(parsedFile.content));
     const htmlText = HtmlToNext(await marked(parsedFile.content));
-    //新增翻译
+    // const enHtmlText = HtmlToNext(await marked(enText));
 
+    //新增翻译
     compiledFiles.push(
       picPath
         ? {
@@ -42,5 +52,6 @@ export async function compileFile(): Promise<mdFile[]> {
         : { mdMatter: newMatter, mdHtml: htmlText }
     );
   }
+
   return compiledFiles;
 }

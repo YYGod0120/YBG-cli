@@ -118,8 +118,8 @@ export default function Page() {
 import he from "he";
 function ImageRepimg(html) {
   const processedHtml = html.replace(
-    /<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g,
-    function(match, src, alt) {
+    /<img\s+src="([^"]*)"\s+alt="([^"]*)"(?:\s+width="([^"]*)")?[^>]*\/>/g,
+    function(match, src, alt, width = "100%") {
       const modifiedSrc = src.split("/");
       const newSrc = modifiedSrc[modifiedSrc.length - 1];
       const modifiedAlt = alt;
@@ -129,7 +129,7 @@ function ImageRepimg(html) {
       )}} alt="${modifiedAlt}" 
       sizes="100vw"
       style={{
-        width: '100%',
+        width: "${width}",
         height: 'auto',
       }} />`;
     }
@@ -161,9 +161,14 @@ function HtmlToNext(html) {
 
 // src/compile/extractMd.ts
 var _postFolder = path2.join(basePath, "/_posts");
-async function compileFile() {
+async function compileFile(project) {
   let compiledFiles = [];
-  const fileList = fs.readdirSync(_postFolder);
+  let fileList = fs.readdirSync(_postFolder);
+  if (project) {
+    fileList = fileList.filter((file) => {
+      return file === `${project}.md`;
+    });
+  }
   for (const file of fileList) {
     const filePath = path2.join(_postFolder, file);
     const fileContent = fs.readFileSync(filePath, "utf-8");
@@ -220,10 +225,10 @@ function getRandomColor(string) {
 
 // src/create/writeFiles.ts
 function writeFile(files) {
-  rimrafSync(`${basePath}/app/[language]/essay`, {
-    preserveRoot: false
-  });
   files.forEach(async (file, index2) => {
+    rimrafSync(`${basePath}/app/[language]/essay/${file.mdMatter.data.date}`, {
+      preserveRoot: false
+    });
     const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${index2 + 1}`;
     const filePath = path4.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
@@ -452,32 +457,45 @@ async function index() {
 
 // src/utils/translate.ts
 import crypto from "crypto";
+import fetch from "node-fetch";
 import "dotenv/config";
 console.log(process.env.APPID);
 var URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
 var APPID = process.env.APPID;
 var SIGN = process.env.SIGN;
-var salt = "yy";
+var salt = "1435660288";
 function utf8Encode(str) {
-  return Buffer.from(str, "utf-8").toString("hex");
+  return Buffer.from(str, "utf-8").toString();
 }
-function md5(appid, q, salt2, sign) {
-  const str1 = appid + q + salt2 + sign;
-  const md5Hash = crypto.createHash("md5").update(str1).digest("hex");
-  return md5Hash;
+function generateSignature(appid, q, salt2, secretKey) {
+  const str1 = `${appid}${q}${salt2}${secretKey}`;
+  const sign = crypto.createHash("md5").update(str1, "utf8").digest("hex");
+  return sign;
 }
 async function translateWord(q) {
-  const sign = md5(APPID, q, salt, SIGN);
-  const from = "zh";
-  const to = "en";
-  const searchWord = utf8Encode(q);
-  const finallyUrl = URL + `?q=${searchWord}&form=${from}&to=${to}&appid=${APPID}&salt=${salt}&sign=${sign}`;
+  if (!APPID || !SIGN) {
+    throw new Error("no APPID or no SIGN");
+  } else {
+    const sign = generateSignature(APPID, q, salt, SIGN);
+    const from = "zh";
+    const to = "en";
+    const finallyUrl = URL + `?q=${utf8Encode(q)}&from=${from}&to=${to}&appid=${APPID}&salt=${salt}&sign=${sign}`;
+    const rep = await fetch(finallyUrl);
+    const data = await rep.json();
+    console.log(data);
+    const res = data.trans_result.reduce((pre, nex) => {
+      return { src: pre.src + nex.src, dst: pre.dst + nex.dst };
+    });
+    console.log(res);
+    return res.dst;
+  }
 }
 
 // src/node/cli.ts
 var cli = cac();
-cli.command("compile", "mdToTsx").action(async () => {
-  const files = await compileFile();
+cli.command("compile [project]", "mdToTsx").option("-a, --all", "Compile all projects").action(async (project, options) => {
+  const { all } = options;
+  const files = all ? await compileFile() : await compileFile(project);
   writeFile(files);
   writeFileData();
 });
@@ -495,7 +513,7 @@ cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
 cli.command("t", "\u7FFB\u8BD1").action(async () => {
-  translateWord("\u6D4B\u8BD5\u4E00\u4E0B\uFF0C\u8FD9\u4E2A\u767E\u5EA6\u7FFB\u8BD1\u53EF\u4EE5\u4E0D");
+  translateWord(`\u8BE5\u600E\u4E48\u5904\u7406md\u6587\u6863\u548B\u529E`);
 });
 cli.parse();
 //# sourceMappingURL=index.js.map
