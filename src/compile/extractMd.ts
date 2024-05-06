@@ -9,6 +9,7 @@ import { translateWord } from "../utils/translate";
 const _postFolder = path.join(basePath, "/_posts");
 
 export type mdFile = {
+  id: string;
   mdMatter: matter.GrayMatterFile<string>;
   mdHtml: string;
   mdEnHtml?: string;
@@ -16,7 +17,14 @@ export type mdFile = {
     picPath: string;
   };
 };
-
+// * hash唯一化
+function simpleHash(input: string) {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash += input.charCodeAt(i);
+  }
+  return JSON.stringify(hash % 1000); // 取模以确保哈希值在一定范围内
+}
 export async function compileFile(project?: string): Promise<mdFile[]> {
   let compiledFiles: mdFile[] = [];
   let fileList = fs.readdirSync(_postFolder);
@@ -43,13 +51,14 @@ export async function compileFile(project?: string): Promise<mdFile[]> {
     compiledFiles.push(
       picPath
         ? {
+            id: simpleHash(file),
             mdMatter: newMatter,
             mdHtml: htmlText,
             other: {
               picPath: picPath,
             },
           }
-        : { mdMatter: newMatter, mdHtml: htmlText }
+        : { id: simpleHash(file), mdMatter: newMatter, mdHtml: htmlText }
     );
   }
 

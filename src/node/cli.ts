@@ -15,7 +15,6 @@ cli
   .action(async (project, options) => {
     const { all } = options;
     const files = all ? await compileFile() : await compileFile(project);
-
     writeFile(files);
     writeFileData();
   });

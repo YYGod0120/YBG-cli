@@ -10,13 +10,11 @@ export function writeFile(files: mdFile[]) {
   // rimrafSync(`${basePath}/app/[language]/essay`, {
   //   preserveRoot: false,
   // });
-  files.forEach(async (file, index) => {
+  files.forEach(async (file) => {
     rimrafSync(`${basePath}/app/[language]/essay/${file.mdMatter.data.date}`, {
       preserveRoot: false,
     });
-    const foldPath = `${basePath}/app/[language]/essay/${
-      file.mdMatter.data.date
-    }/${index + 1}`;
+    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${file.id}`;
     const filePath = path.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
 

@@ -4,12 +4,12 @@ import { mdFile } from "../compile/extractMd";
 export function transformType(files: mdFile[]) {
   let newData: { [x: string]: string }[] = [];
   files.forEach((file, index) => {
-    const { mdMatter, mdHtml } = file;
+    const { mdMatter, mdHtml, id } = file;
     const { data } = mdMatter;
     const newMatter = {
       ...data,
+      id: id,
       html: mdHtml,
-      id: index + 1 + "",
     };
     newData.push(newMatter);
   });

@@ -48,6 +48,34 @@ h6 {
   text-decoration: underline;
   text-underline-offset: 6px;
 }
+@media screen and (max-width: 540px) {
+  h1 {
+    font-size: 1.5em; /* 1.5\u500D\u4E8E\u57FA\u7840\u5B57\u4F53\u5927\u5C0F */
+    line-height: 1.5em;
+  }
+
+  h2 {
+    font-size: 1.35em; /* 1.25\u500D\u4E8E\u57FA\u7840\u5B57\u4F53\u5927\u5C0F */
+    line-height: 1.5em;
+  }
+
+  h3 {
+    font-size: 1.2em; /* \u57FA\u7840\u5B57\u4F53\u5927\u5C0F */
+    line-height: 1.5em;
+  }
+  h4 {
+    font-size: 1.05em; /* \u57FA\u7840\u5B57\u4F53\u5927\u5C0F */
+    line-height: 1.5em;
+  }
+  h5 {
+    font-size: 1em; /* \u57FA\u7840\u5B57\u4F53\u5927\u5C0F */
+    line-height: 1.5em;
+  }
+  h6 {
+    font-size: 1em; /* \u57FA\u7840\u5B57\u4F53\u5927\u5C0F */
+    line-height: 1.5em;
+  }
+}
 a:hover{
   color:#0c7ad8
 }
@@ -98,7 +126,7 @@ export default function Page() {
       ${file.mdMatter.data.title}
     </span>
     <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
-      Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${file.mdMatter.data.date}
+      Categories: ${file.mdMatter.data.categories} &nbsp;  ${file.mdMatter.data.date}
     </span>
     <div className="flex text-start break-words flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
       ${file.mdHtml}
@@ -119,7 +147,7 @@ import he from "he";
 function ImageRepimg(html) {
   const processedHtml = html.replace(
     /<img\s+src="([^"]*)"\s+alt="([^"]*)"(?:\s+width="([^"]*)")?[^>]*\/>/g,
-    function(match, src, alt, width = "100%") {
+    function(match, src, alt) {
       const modifiedSrc = src.split("/");
       const newSrc = modifiedSrc[modifiedSrc.length - 1];
       const modifiedAlt = alt;
@@ -129,7 +157,7 @@ function ImageRepimg(html) {
       )}} alt="${modifiedAlt}" 
       sizes="100vw"
       style={{
-        width: "${width}",
+        width: "100%",
         height: 'auto',
       }} />`;
     }
@@ -161,6 +189,13 @@ function HtmlToNext(html) {
 
 // src/compile/extractMd.ts
 var _postFolder = path2.join(basePath, "/_posts");
+function simpleHash(input) {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash += input.charCodeAt(i);
+  }
+  return JSON.stringify(hash % 1e3);
+}
 async function compileFile(project) {
   let compiledFiles = [];
   let fileList = fs.readdirSync(_postFolder);
@@ -181,12 +216,13 @@ async function compileFile(project) {
     const htmlText = HtmlToNext(await marked(parsedFile.content));
     compiledFiles.push(
       picPath ? {
+        id: simpleHash(file),
         mdMatter: newMatter,
         mdHtml: htmlText,
         other: {
           picPath
         }
-      } : { mdMatter: newMatter, mdHtml: htmlText }
+      } : { id: simpleHash(file), mdMatter: newMatter, mdHtml: htmlText }
     );
   }
   return compiledFiles;
@@ -225,11 +261,11 @@ function getRandomColor(string) {
 
 // src/create/writeFiles.ts
 function writeFile(files) {
-  files.forEach(async (file, index2) => {
+  files.forEach(async (file) => {
     rimrafSync(`${basePath}/app/[language]/essay/${file.mdMatter.data.date}`, {
       preserveRoot: false
     });
-    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${index2 + 1}`;
+    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${file.id}`;
     const filePath = path4.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
     fs3.mkdir(foldPath, { recursive: true }, (error) => {
@@ -313,12 +349,12 @@ import fs7 from "fs";
 function transformType(files) {
   let newData = [];
   files.forEach((file, index2) => {
-    const { mdMatter, mdHtml } = file;
+    const { mdMatter, mdHtml, id } = file;
     const { data } = mdMatter;
     const newMatter = {
       ...data,
-      html: mdHtml,
-      id: index2 + 1 + ""
+      id,
+      html: mdHtml
     };
     newData.push(newMatter);
   });

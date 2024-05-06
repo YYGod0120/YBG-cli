@@ -33,6 +33,34 @@ h6 {
   text-decoration: underline;
   text-underline-offset: 6px;
 }
+@media screen and (max-width: 540px) {
+  h1 {
+    font-size: 1.5em; /* 1.5倍于基础字体大小 */
+    line-height: 1.5em;
+  }
+
+  h2 {
+    font-size: 1.35em; /* 1.25倍于基础字体大小 */
+    line-height: 1.5em;
+  }
+
+  h3 {
+    font-size: 1.2em; /* 基础字体大小 */
+    line-height: 1.5em;
+  }
+  h4 {
+    font-size: 1.05em; /* 基础字体大小 */
+    line-height: 1.5em;
+  }
+  h5 {
+    font-size: 1em; /* 基础字体大小 */
+    line-height: 1.5em;
+  }
+  h6 {
+    font-size: 1em; /* 基础字体大小 */
+    line-height: 1.5em;
+  }
+}
 a:hover{
   color:#0c7ad8
 }
@@ -88,7 +116,7 @@ export default function Page() {
       ${file.mdMatter.data.title}
     </span>
     <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
-      Categories: ${file.mdMatter.data.categories} &nbsp; &nbsp; ${
+      Categories: ${file.mdMatter.data.categories} &nbsp;  ${
     file.mdMatter.data.date
   }
     </span>
