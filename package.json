@@ -1,6 +1,6 @@
 {
   "name": "ybg-cli",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Cli for yyblog",
   "main": "index.js",
   "type": "module",
