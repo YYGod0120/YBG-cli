@@ -24,6 +24,7 @@
     "README.md"
   ],
   "dependencies": {
+    "@esbuild/darwin-x64": "0.23.1",
     "cac": "^6.7.14",
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
@@ -32,8 +33,12 @@
     "marked": "^11.1.1",
     "node-fetch": "^3.3.2",
     "picocolors": "^1.0.0",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "remark-parse": "^11.0.0",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
-    "tsup": "^8.0.1"
+    "tsup": "^8.0.1",
+    "unified": "^11.0.5"
   }
 }

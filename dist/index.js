@@ -105,11 +105,11 @@ import ${src.slice(0, src.lastIndexOf("."))} from "@/public${srcValues}"`;
   }
   return IMGIMPORT;
 }
-async function makeEssayPage(file) {
+async function makeEssayPage(file2) {
   let TEMPLATE = `
   import Image from "next/image";
 import dynamic from "next/dynamic";
-  ${file.other ? file.other.picPath : ""}
+  ${file2.other ? file2.other.picPath : ""}
   // @ts-ignore
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
@@ -123,13 +123,13 @@ export default function Page() {
     <div>
     <div className="mt-8 bg-white flex flex-col items-start text-lg shadow-lg rounded-sm">
     <span className="text-4xl text-left lg:px-20 md:px-[2.5vw] px-4 pt-12 text-visit-font font-bold">
-      ${file.mdMatter.data.title}
+      ${file2.mdMatter.data.title}
     </span>
     <span className="text-[#86909C] lg:px-20 pt-5 px-4 text-xl mb-5 md:px-[2.5vw]">
-      Categories: ${file.mdMatter.data.categories} &nbsp;  ${file.mdMatter.data.date}
+      Categories: ${file2.mdMatter.data.categories} &nbsp;  ${file2.mdMatter.data.date}
     </span>
     <div className="flex text-start break-words flex-col pb-12 lg:px-20 lg:w-[740px] md:w-[90vw] md:px-[2.5vw] w-[95vw] px-[2.5vw]">
-      ${file.mdHtml}
+      ${file2.mdHtml}
     </div>
     
   </div>
@@ -200,12 +200,12 @@ async function compileFile(project) {
   let compiledFiles = [];
   let fileList = fs.readdirSync(_postFolder);
   if (project) {
-    fileList = fileList.filter((file) => {
-      return file === `${project}.md`;
+    fileList = fileList.filter((file2) => {
+      return file2 === `${project}.md`;
     });
   }
-  for (const file of fileList) {
-    const filePath = path2.join(_postFolder, file);
+  for (const file2 of fileList) {
+    const filePath = path2.join(_postFolder, file2);
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const parsedFile = matter(fileContent);
     const newMatter = {
@@ -216,13 +216,13 @@ async function compileFile(project) {
     const htmlText = HtmlToNext(await marked(parsedFile.content));
     compiledFiles.push(
       picPath ? {
-        id: simpleHash(file),
+        id: simpleHash(file2),
         mdMatter: newMatter,
         mdHtml: htmlText,
         other: {
           picPath
         }
-      } : { id: simpleHash(file), mdMatter: newMatter, mdHtml: htmlText }
+      } : { id: simpleHash(file2), mdMatter: newMatter, mdHtml: htmlText }
     );
   }
   return compiledFiles;
@@ -261,13 +261,13 @@ function getRandomColor(string) {
 
 // src/create/writeFiles.ts
 function writeFile(files) {
-  files.forEach(async (file) => {
-    rimrafSync(`${basePath}/app/[language]/essay/${file.mdMatter.data.date}`, {
+  files.forEach(async (file2) => {
+    rimrafSync(`${basePath}/app/[language]/essay/${file2.mdMatter.data.date}`, {
       preserveRoot: false
     });
-    const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${file.id}`;
+    const foldPath = `${basePath}/app/[language]/essay/${file2.mdMatter.data.date}/${file2.id}`;
     const filePath = path4.join(foldPath, "page.tsx");
-    const content = await makeEssayPage(file);
+    const content = await makeEssayPage(file2);
     fs3.mkdir(foldPath, { recursive: true }, (error) => {
       if (error) {
         console.log(error);
@@ -279,7 +279,7 @@ function writeFile(files) {
           } else {
             console.log(
               `Page-${getRandomColor(
-                file.mdMatter.data.title
+                file2.mdMatter.data.title
               )} created successfully.`
             );
           }
@@ -328,16 +328,16 @@ function createImgs(title) {
 import path6 from "path";
 import fs6 from "fs";
 import { rimraf } from "rimraf";
-function removePage(file) {
-  const MdPath = path6.join(basePath, `/_posts/${file}.md`);
+function removePage(file2) {
+  const MdPath = path6.join(basePath, `/_posts/${file2}.md`);
   fs6.unlink(MdPath, (err) => {
     if (err) {
       console.error(`Error deleting file: ${err}`);
     } else {
-      console.log(`File-${file} deleted successfully`);
+      console.log(`File-${file2} deleted successfully`);
     }
   });
-  const foldPath = `${basePath}/public/imgs/${file}`;
+  const foldPath = `${basePath}/public/imgs/${file2}`;
   rimraf(foldPath, { preserveRoot: false });
 }
 
@@ -348,8 +348,8 @@ import fs7 from "fs";
 // src/utils/transformType.ts
 function transformType(files) {
   let newData = [];
-  files.forEach((file, index2) => {
-    const { mdMatter, mdHtml, id } = file;
+  files.forEach((file2, index2) => {
+    const { mdMatter, mdHtml, id } = file2;
     const { data } = mdMatter;
     const newMatter = {
       ...data,
@@ -491,6 +491,19 @@ async function index() {
   });
 }
 
+// src/compile/remarkTest.ts
+import { unified } from "unified";
+import markdown from "remark-parse";
+var file = `
+# Hello World
+**TEST**
+`;
+async function test() {
+  const processor = unified().use(markdown);
+  const ast = processor.parse(file);
+  console.log(JSON.stringify(ast, null, 2));
+}
+
 // src/node/cli.ts
 var cli = cac();
 cli.command("compile [project]", "mdToTsx").option("-a, --all", "Compile all projects").action(async (project, options) => {
@@ -514,6 +527,7 @@ cli.command("deploy", "deploy the new essay").action(async () => {
 });
 cli.command("t", "\u6D4B\u8BD5").action(async () => {
   console.log(`\u5F00\u53D1 \u26A1\uFE0F\u26A1\uFE0F\u26A1\uFE0F`);
+  console.log(await test());
 });
 cli.parse();
 //# sourceMappingURL=index.js.map

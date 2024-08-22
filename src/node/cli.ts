@@ -8,6 +8,7 @@ import { removePage } from "../remove/removePage";
 import { writeFileData } from "../create/createFileData";
 import { index, init } from "../deploy";
 import { translateWord } from "../utils/translate";
+import { test } from "../compile/remarkTest";
 const cli = cac();
 cli
   .command("compile [project]", "mdToTsx")
@@ -37,5 +38,6 @@ cli.command("deploy", "deploy the new essay").action(async () => {
 });
 cli.command("t", "测试").action(async () => {
   console.log(`开发 ⚡️⚡️⚡️`);
+  console.log(await test());
 });
 cli.parse();
