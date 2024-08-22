@@ -36,6 +36,6 @@ cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
 cli.command("t", "测试").action(async () => {
-  console.log(`测试是否开发环境`);
+  console.log(`开发 ⚡️⚡️⚡️`);
 });
 cli.parse();

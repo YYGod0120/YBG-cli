@@ -1,8 +1,19 @@
+# 开发指南
+
+`pnpm start`：进行 TS 编译，实时热更新
+`pnpm link -g`: 全局链接 CLI
+`ybg t`: 测试是否链接成功
+
+`npm publish`：最后发版
+
+**注意：记得改版本！！！**
+**注意：记得编译完测试完再发版！！！**
+
 # CLI 命令
 
 ## ybg compile [name]
 
-编译 `_posts`下的名字为name的文章(默认为全部文章)
+编译 `_posts`下的名字为 name 的文章(默认为全部文章)
 
 > 适配 NextJS(默认路径是/app/essay/[time]/[name])
 
@@ -16,9 +27,10 @@
 
 ## 部署相关
 
-### ybg init 
+### ybg init
 
-自定义部署路径仓库以及初始化(需要在根目录下写_deploy配置文件)
+自定义部署路径仓库以及初始化(需要在根目录下写\_deploy 配置文件)
+
 ```json
 {
   "deployCon": {
@@ -28,9 +40,8 @@
     "branch": "main"
   }
 }
-
 ```
 
 ### ybg deploy
 
-根据_deploy配置进行默认部署
+根据\_deploy 配置进行默认部署

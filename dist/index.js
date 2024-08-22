@@ -513,7 +513,7 @@ cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
 cli.command("t", "\u6D4B\u8BD5").action(async () => {
-  console.log(`\u6D4B\u8BD5\u662F\u5426\u5F00\u53D1\u73AF\u5883`);
+  console.log(`\u5F00\u53D1 \u26A1\uFE0F\u26A1\uFE0F\u26A1\uFE0F`);
 });
 cli.parse();
 //# sourceMappingURL=index.js.map
