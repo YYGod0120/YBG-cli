@@ -35,7 +35,7 @@ cli.command("init", "for deploy").action(async () => {
 cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
-cli.command("t", "翻译").action(async () => {
-  translateWord(`该怎么处理md文档咋办`);
+cli.command("t", "测试").action(async () => {
+  console.log(`测试是否开发环境`);
 });
 cli.parse();

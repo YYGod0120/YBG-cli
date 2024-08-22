@@ -1,6 +1,5 @@
 node_modules
-public/
-_posts/
+dist/
 app/
 out/
 .vscode

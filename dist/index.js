@@ -491,42 +491,6 @@ async function index() {
   });
 }
 
-// src/utils/translate.ts
-import crypto from "crypto";
-import fetch from "node-fetch";
-import "dotenv/config";
-console.log(process.env.APPID);
-var URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
-var APPID = process.env.APPID;
-var SIGN = process.env.SIGN;
-var salt = "1435660288";
-function utf8Encode(str) {
-  return Buffer.from(str, "utf-8").toString();
-}
-function generateSignature(appid, q, salt2, secretKey) {
-  const str1 = `${appid}${q}${salt2}${secretKey}`;
-  const sign = crypto.createHash("md5").update(str1, "utf8").digest("hex");
-  return sign;
-}
-async function translateWord(q) {
-  if (!APPID || !SIGN) {
-    throw new Error("no APPID or no SIGN");
-  } else {
-    const sign = generateSignature(APPID, q, salt, SIGN);
-    const from = "zh";
-    const to = "en";
-    const finallyUrl = URL + `?q=${utf8Encode(q)}&from=${from}&to=${to}&appid=${APPID}&salt=${salt}&sign=${sign}`;
-    const rep = await fetch(finallyUrl);
-    const data = await rep.json();
-    console.log(data);
-    const res = data.trans_result.reduce((pre, nex) => {
-      return { src: pre.src + nex.src, dst: pre.dst + nex.dst };
-    });
-    console.log(res);
-    return res.dst;
-  }
-}
-
 // src/node/cli.ts
 var cli = cac();
 cli.command("compile [project]", "mdToTsx").option("-a, --all", "Compile all projects").action(async (project, options) => {
@@ -548,8 +512,8 @@ cli.command("init", "for deploy").action(async () => {
 cli.command("deploy", "deploy the new essay").action(async () => {
   index();
 });
-cli.command("t", "\u7FFB\u8BD1").action(async () => {
-  translateWord(`\u8BE5\u600E\u4E48\u5904\u7406md\u6587\u6863\u548B\u529E`);
+cli.command("t", "\u6D4B\u8BD5").action(async () => {
+  console.log(`\u6D4B\u8BD5\u662F\u5426\u5F00\u53D1\u73AF\u5883`);
 });
 cli.parse();
 //# sourceMappingURL=index.js.map
