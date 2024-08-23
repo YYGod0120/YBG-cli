@@ -1,12 +1,13 @@
 import crypto from "crypto";
 import fetch from "node-fetch";
 import "dotenv/config";
-console.log(process.env.APPID);
 
 const URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
 const APPID = process.env.APPID;
 const SIGN = process.env.SIGN;
 const salt = "1435660288";
+
+console.log(`APPID: ${APPID}, SIGN: ${SIGN}`);
 interface TranslateRep {
   to: string;
   from: string;
@@ -47,13 +48,8 @@ export async function translateWord(q: string): Promise<string> {
 
     const rep = await fetch(finallyUrl);
     const data: TranslateRep = (await rep.json()) as TranslateRep;
-    console.log(data);
-    const res = data.trans_result.reduce((pre, nex) => {
-      return { src: pre.src + nex.src, dst: pre.dst + nex.dst };
-    });
-
-    console.log(res);
-
-    return res.dst;
+    const result = data.trans_result;
+    console.log(result);
+    return result[0].dst;
   }
 }
