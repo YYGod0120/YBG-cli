@@ -7,7 +7,7 @@ import { createImgs } from "../create/createImg";
 import { removePage } from "../remove/removePage";
 import { writeFileData } from "../create/createFileData";
 import { index, init } from "../deploy";
-import { translateWord } from "../utils/translate";
+import { createI18nFile } from "../create/createI18nFile";
 const cli = cac();
 cli
   .command("compile [project]", "mdToTsx")
@@ -18,24 +18,24 @@ cli
     writeFile(files);
     writeFileData();
   });
-cli
-  .command("create [project]", "create the new essay")
-  .action(async (project) => {
-    createEssay(currentDate, project);
-    createImgs(project);
-  });
-cli
-  .command("remove [project]", "remove the new essay")
-  .action(async (project) => {
-    removePage(project);
-  });
-cli.command("init", "for deploy").action(async () => {
+cli.command("create [project]", "create the new essay").action((project) => {
+  createEssay(currentDate, project);
+  createImgs(project);
+});
+cli.command("remove [project]", "remove the new essay").action((project) => {
+  removePage(project);
+});
+cli.command("init", "for deploy").action(() => {
   init();
 });
-cli.command("deploy", "deploy the new essay").action(async () => {
+cli.command("deploy", "deploy the new essay").action(() => {
   index();
 });
-cli.command("t", "测试").action(async () => {
+cli.command("t", "测试").action(() => {
   console.log(`开发 ⚡️⚡️⚡️`);
+});
+
+cli.command("translate [file]", "translate the file").action(async (file) => {
+  await createI18nFile(file);
 });
 cli.parse();
