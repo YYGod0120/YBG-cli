@@ -489,31 +489,91 @@ async function index() {
   });
 }
 
-// src/compile/remarkTest.ts
+// src/create/createI18nFile.ts
+import fs11 from "fs";
+import path11 from "path";
+
+// src/compile/translateMd.ts
 import { unified } from "unified";
 import fs10 from "fs";
 import stringify from "remark-stringify";
 import markdown from "remark-parse";
+
+// src/utils/translate.ts
+import crypto from "crypto";
+import fetch from "node-fetch";
+import "dotenv/config";
+var URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
+var APPID = process.env.APPID;
+var SIGN = process.env.SIGN;
+var salt = "1435660288";
+console.log(`APPID: ${APPID}, SIGN: ${SIGN}`);
+function utf8Encode(str) {
+  return Buffer.from(str, "utf-8").toString();
+}
+function generateSignature(appid, q, salt2, secretKey) {
+  const str1 = `${appid}${q}${salt2}${secretKey}`;
+  const sign = crypto.createHash("md5").update(str1, "utf8").digest("hex");
+  return sign;
+}
+async function translateWord(q) {
+  if (!APPID || !SIGN) {
+    throw new Error("no APPID or no SIGN");
+  } else {
+    const sign = generateSignature(APPID, q, salt, SIGN);
+    const from = "zh";
+    const to = "en";
+    const finallyUrl = URL + `?q=${utf8Encode(q)}&from=${from}&to=${to}&appid=${APPID}&salt=${salt}&sign=${sign}`;
+    const rep = await fetch(finallyUrl);
+    const data = await rep.json();
+    const result = data.trans_result;
+    return result[0].dst;
+  }
+}
+
+// src/compile/translateMd.ts
 import { visit } from "unist-util-visit";
 import path10 from "path";
 import frontmatter from "remark-frontmatter";
 var _postFolder2 = path10.join(basePath, "/_posts");
-async function astOfMd(file) {
+async function translateMd(file) {
   const filePath = path10.join(_postFolder2, `${file}.md`);
   const fileContent = fs10.readFileSync(filePath, "utf-8");
-  const tanslation = [];
+  const title = `essay-${file}.json`;
+  const translation = [];
   const processor = await unified().use(markdown).use(frontmatter, ["yaml"]).use(stringify);
   const ast = processor.parse(fileContent);
   visit(ast, "text", (node) => {
     if (node.value) {
-      tanslation.push({ src: node.value.replace(/\n/g, ""), dst: "" });
+      translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
     }
   });
-  console.log(tanslation);
-  for (const item of tanslation) {
-    console.log(item);
+  for (const item of translation) {
+    const dst = await translateWord(item.src);
+    item.dst_en = dst;
   }
-  return tanslation;
+  return translation;
+}
+
+// src/create/createI18nFile.ts
+var i18nFolder = path11.join(basePath, "/app/i18n/locales");
+async function createI18nFile(file) {
+  const zh = {};
+  const en = {};
+  const tanslation = await translateMd(file);
+  console.log(tanslation);
+  tanslation.forEach((item, index2) => {
+    zh[index2] = item.src;
+    en[index2] = item.dst_en;
+  });
+  fs11.writeFileSync(
+    path11.join(i18nFolder, "zh-CN", `essay-${file}.json`),
+    JSON.stringify(zh, null, 2)
+  );
+  fs11.writeFileSync(
+    path11.join(i18nFolder, "en-US", `essay-${file}.json`),
+    JSON.stringify(en, null, 2)
+  );
 }
 
 // src/node/cli.ts
@@ -541,7 +601,7 @@ cli.command("t", "\u6D4B\u8BD5").action(() => {
   console.log(`\u5F00\u53D1 \u26A1\uFE0F\u26A1\uFE0F\u26A1\uFE0F`);
 });
 cli.command("translate [file]", "translate the file").action(async (file) => {
-  await astOfMd(file);
+  await createI18nFile(file);
 });
 cli.parse();
 //# sourceMappingURL=index.js.map

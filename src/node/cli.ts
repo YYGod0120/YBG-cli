@@ -7,8 +7,7 @@ import { createImgs } from "../create/createImg";
 import { removePage } from "../remove/removePage";
 import { writeFileData } from "../create/createFileData";
 import { index, init } from "../deploy";
-import { translateWord } from "../utils/translate";
-import { astOfMd } from "../compile/remarkTest";
+import { createI18nFile } from "../create/createI18nFile";
 const cli = cac();
 cli
   .command("compile [project]", "mdToTsx")
@@ -37,6 +36,6 @@ cli.command("t", "测试").action(() => {
 });
 
 cli.command("translate [file]", "translate the file").action(async (file) => {
-  await astOfMd(file);
+  await createI18nFile(file);
 });
 cli.parse();

@@ -49,7 +49,6 @@ export async function translateWord(q: string): Promise<string> {
     const rep = await fetch(finallyUrl);
     const data: TranslateRep = (await rep.json()) as TranslateRep;
     const result = data.trans_result;
-    console.log(result);
     return result[0].dst;
   }
 }

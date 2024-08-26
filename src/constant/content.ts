@@ -1,5 +1,5 @@
 import path from "path";
-import { mdFile } from "../compile/extractMd";
+import { mdFile } from "../../types/files";
 export const basePath = path.join(process.cwd(), "./");
 export const ESSAYCSS = `
 blockquote {
