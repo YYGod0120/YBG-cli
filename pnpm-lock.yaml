@@ -23,27 +23,33 @@ dependencies:
   he:
     specifier: ^1.2.0
     version: 1.2.0
-  marked:
-    specifier: ^11.1.1
-    version: 11.2.0
   node-fetch:
     specifier: ^3.3.2
     version: 3.3.2
   picocolors:
     specifier: ^1.0.0
     version: 1.0.1
+  rehype-stringify:
+    specifier: ^10.0.0
+    version: 10.0.0
   remark:
     specifier: ^15.0.1
     version: 15.0.1
   remark-frontmatter:
     specifier: ^5.0.0
     version: 5.0.0
+  remark-gfm:
+    specifier: ^4.0.0
+    version: 4.0.0
   remark-html:
     specifier: ^16.0.1
     version: 16.0.1
   remark-parse:
     specifier: ^11.0.0
     version: 11.0.0
+  remark-rehype:
+    specifier: ^11.1.0
+    version: 11.1.0
   remark-stringify:
     specifier: ^11.0.0
     version: 11.0.0
@@ -1204,10 +1210,17 @@ packages:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
     dev: false
 
-  /marked@11.2.0:
-    resolution: {integrity: sha512-HR0m3bvu0jAPYiIvLUUQtdg1g6D247//lvcekpHO1WMvbwDlwSkZAX9Lw4F4YHE1T0HaaNve0tuAWuV1UJ6vtw==}
-    engines: {node: '>= 18'}
-    hasBin: true
+  /markdown-table@3.0.3:
+    resolution: {integrity: sha1-5jMdMOSTEn4DHdOFSItb0ybkpr0=, tarball: http://r.npm.sankuai.com/markdown-table/download/markdown-table-3.0.3.tgz}
+    dev: false
+
+  /mdast-util-find-and-replace@3.0.1:
+    resolution: {integrity: sha1-pvx7YvCZTpc0kORSYuS8B2B7BOA=, tarball: http://r.npm.sankuai.com/mdast-util-find-and-replace/download/mdast-util-find-and-replace-3.0.1.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      escape-string-regexp: 5.0.0
+      unist-util-is: 6.0.0
+      unist-util-visit-parents: 6.0.1
     dev: false
 
   /mdast-util-from-markdown@2.0.1:
@@ -1238,6 +1251,75 @@ packages:
       mdast-util-from-markdown: 2.0.1
       mdast-util-to-markdown: 2.1.0
       micromark-extension-frontmatter: 2.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /mdast-util-gfm-autolink-literal@2.0.1:
+    resolution: {integrity: sha1-q9VXYwM3vTCm1aS9glLhwtwIddU=, tarball: http://r.npm.sankuai.com/mdast-util-gfm-autolink-literal/download/mdast-util-gfm-autolink-literal-2.0.1.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      ccount: 2.0.1
+      devlop: 1.1.0
+      mdast-util-find-and-replace: 3.0.1
+      micromark-util-character: 2.1.0
+    dev: false
+
+  /mdast-util-gfm-footnote@2.0.0:
+    resolution: {integrity: sha1-JaF1PH0W24v9U82E/lBWK9Hm1qk=, tarball: http://r.npm.sankuai.com/mdast-util-gfm-footnote/download/mdast-util-gfm-footnote-2.0.0.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.1
+      mdast-util-to-markdown: 2.1.0
+      micromark-util-normalize-identifier: 2.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /mdast-util-gfm-strikethrough@2.0.0:
+    resolution: {integrity: sha1-1E756O0oOsjBFlqw0N/QWMJ2TBY=, tarball: http://r.npm.sankuai.com/mdast-util-gfm-strikethrough/download/mdast-util-gfm-strikethrough-2.0.0.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-from-markdown: 2.0.1
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /mdast-util-gfm-table@2.0.0:
+    resolution: {integrity: sha1-ekNftiI6crCGKzOvvXErba6HjTg=, tarball: http://r.npm.sankuai.com/mdast-util-gfm-table/download/mdast-util-gfm-table-2.0.0.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      markdown-table: 3.0.3
+      mdast-util-from-markdown: 2.0.1
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /mdast-util-gfm-task-list-item@2.0.0:
+    resolution: {integrity: sha1-5oCV0vikMD7yQJSrZC4QR7mRqTY=, tarball: http://r.npm.sankuai.com/mdast-util-gfm-task-list-item/download/mdast-util-gfm-task-list-item-2.0.0.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.1
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /mdast-util-gfm@3.0.0:
+    resolution: {integrity: sha1-PyrsyHl4XDy2qB/zokPcEeymEJU=, tarball: http://r.npm.sankuai.com/mdast-util-gfm/download/mdast-util-gfm-3.0.0.tgz}
+    dependencies:
+      mdast-util-from-markdown: 2.0.1
+      mdast-util-gfm-autolink-literal: 2.0.1
+      mdast-util-gfm-footnote: 2.0.0
+      mdast-util-gfm-strikethrough: 2.0.0
+      mdast-util-gfm-table: 2.0.0
+      mdast-util-gfm-task-list-item: 2.0.0
+      mdast-util-to-markdown: 2.1.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -1318,6 +1400,78 @@ packages:
       fault: 2.0.1
       micromark-util-character: 2.1.0
       micromark-util-symbol: 2.0.0
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm-autolink-literal@2.1.0:
+    resolution: {integrity: sha1-Yoau6WhsRGLB41UqnVBf7dzuuTU=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm-autolink-literal/download/micromark-extension-gfm-autolink-literal-2.1.0.tgz}
+    dependencies:
+      micromark-util-character: 2.1.0
+      micromark-util-sanitize-uri: 2.0.0
+      micromark-util-symbol: 2.0.0
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm-footnote@2.1.0:
+    resolution: {integrity: sha1-TatW1OOYuYU/b+TvrE/JNh8+B1A=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm-footnote/download/micromark-extension-gfm-footnote-2.1.0.tgz}
+    dependencies:
+      devlop: 1.1.0
+      micromark-core-commonmark: 2.0.1
+      micromark-factory-space: 2.0.0
+      micromark-util-character: 2.1.0
+      micromark-util-normalize-identifier: 2.0.0
+      micromark-util-sanitize-uri: 2.0.0
+      micromark-util-symbol: 2.0.0
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm-strikethrough@2.1.0:
+    resolution: {integrity: sha1-hhBt+LOmkrX2qSKA04eb5r5G2SM=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm-strikethrough/download/micromark-extension-gfm-strikethrough-2.1.0.tgz}
+    dependencies:
+      devlop: 1.1.0
+      micromark-util-chunked: 2.0.0
+      micromark-util-classify-character: 2.0.0
+      micromark-util-resolve-all: 2.0.0
+      micromark-util-symbol: 2.0.0
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm-table@2.0.0:
+    resolution: {integrity: sha1-LPP+NS2eCJt+9f/wA73+DaKWSbc=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm-table/download/micromark-extension-gfm-table-2.0.0.tgz}
+    dependencies:
+      devlop: 1.1.0
+      micromark-factory-space: 2.0.0
+      micromark-util-character: 2.1.0
+      micromark-util-symbol: 2.0.0
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm-tagfilter@2.0.0:
+    resolution: {integrity: sha1-8m2KeAe1mF+6E89hRltYyl/33Fc=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm-tagfilter/download/micromark-extension-gfm-tagfilter-2.0.0.tgz}
+    dependencies:
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm-task-list-item@2.1.0:
+    resolution: {integrity: sha1-vMNNgFY5gpmQ7BdcPuoSu1t4Hyw=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm-task-list-item/download/micromark-extension-gfm-task-list-item-2.1.0.tgz}
+    dependencies:
+      devlop: 1.1.0
+      micromark-factory-space: 2.0.0
+      micromark-util-character: 2.1.0
+      micromark-util-symbol: 2.0.0
+      micromark-util-types: 2.0.0
+    dev: false
+
+  /micromark-extension-gfm@3.0.0:
+    resolution: {integrity: sha1-PhM3arld16XP0OKVYN/pmWV7PFs=, tarball: http://r.npm.sankuai.com/micromark-extension-gfm/download/micromark-extension-gfm-3.0.0.tgz}
+    dependencies:
+      micromark-extension-gfm-autolink-literal: 2.1.0
+      micromark-extension-gfm-footnote: 2.1.0
+      micromark-extension-gfm-strikethrough: 2.1.0
+      micromark-extension-gfm-table: 2.0.0
+      micromark-extension-gfm-tagfilter: 2.0.0
+      micromark-extension-gfm-task-list-item: 2.1.0
+      micromark-util-combine-extensions: 2.0.0
       micromark-util-types: 2.0.0
     dev: false
 
@@ -1633,12 +1787,33 @@ packages:
       picomatch: 2.3.1
     dev: false
 
+  /rehype-stringify@10.0.0:
+    resolution: {integrity: sha1-IDHPb90DVTk3BvBHTseUx15UkvI=, tarball: http://r.npm.sankuai.com/rehype-stringify/download/rehype-stringify-10.0.0.tgz}
+    dependencies:
+      '@types/hast': 3.0.4
+      hast-util-to-html: 9.0.1
+      unified: 11.0.5
+    dev: false
+
   /remark-frontmatter@5.0.0:
     resolution: {integrity: sha1-to1hVSpCHsQSx29PZsNEYn3Bh6I=, tarball: http://r.npm.sankuai.com/remark-frontmatter/download/remark-frontmatter-5.0.0.tgz}
     dependencies:
       '@types/mdast': 4.0.4
       mdast-util-frontmatter: 2.0.1
       micromark-extension-frontmatter: 2.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /remark-gfm@4.0.0:
+    resolution: {integrity: sha1-rqd38HRHAaooi2fSjENWXH6MNd4=, tarball: http://r.npm.sankuai.com/remark-gfm/download/remark-gfm-4.0.0.tgz}
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-gfm: 3.0.0
+      micromark-extension-gfm: 3.0.0
+      remark-parse: 11.0.0
+      remark-stringify: 11.0.0
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
@@ -1663,6 +1838,16 @@ packages:
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /remark-rehype@11.1.0:
+    resolution: {integrity: sha1-1fJk9CvL1NMA8DCXVgnQGhaXzNw=, tarball: http://r.npm.sankuai.com/remark-rehype/download/remark-rehype-11.1.0.tgz}
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      mdast-util-to-hast: 13.2.0
+      unified: 11.0.5
+      vfile: 6.0.2
     dev: false
 
   /remark-stringify@11.0.0:

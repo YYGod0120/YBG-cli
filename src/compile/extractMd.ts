@@ -1,13 +1,12 @@
 import fs from "fs";
 import matter from "gray-matter";
-import { marked } from "marked";
 import { UTCToString } from "../utils/time";
 import path from "path";
 import { basePath, makeImportPic } from "../constant/content";
 import { HtmlToNext } from "./HtmlToNext";
 
-import { astOfMd } from "./remarkTest";
 import { mdFile, MdMatter } from "../../types/files";
+import { compileByRemark } from "./compileByRemark";
 const _postFolder = path.join(basePath, "/_posts");
 
 // * hash唯一化
@@ -21,7 +20,6 @@ function simpleHash(input: string) {
 export async function compileFile(project?: string): Promise<mdFile[]> {
   let compiledFiles: mdFile[] = [];
   let fileList = fs.readdirSync(_postFolder);
-
   if (project) {
     fileList = fileList.filter((file) => {
       return file === `${project}.md`;
@@ -35,9 +33,9 @@ export async function compileFile(project?: string): Promise<mdFile[]> {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) },
     };
-    const picPath = makeImportPic(await marked(parsedFile.content));
-    const htmlText = HtmlToNext(await marked(parsedFile.content));
-
+    const remarkContent = await compileByRemark(parsedFile.content);
+    const picPath = makeImportPic(remarkContent);
+    const htmlText = HtmlToNext(remarkContent);
     compiledFiles.push(
       picPath
         ? {

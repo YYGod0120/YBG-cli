@@ -1,7 +1,7 @@
 import he from "he";
 function ImageRepimg(html: string) {
   const processedHtml = html.replace(
-    /<img\s+src="([^"]*)"\s+alt="([^"]*)"(?:\s+width="([^"]*)")?[^>]*\/>/g,
+    /<img\s+src="(.*?)"\s+alt="(.*?)"\>/g,
     function (match, src, alt) {
       const modifiedSrc = src.split("/");
       const newSrc = modifiedSrc[modifiedSrc.length - 1]; // Your modification logic for src

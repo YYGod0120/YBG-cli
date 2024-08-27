@@ -16,7 +16,7 @@ cli
     const { all } = options;
     const files = all ? await compileFile() : await compileFile(project);
     writeFile(files);
-    writeFileData();
+    // writeFileData();
   });
 cli.command("create [project]", "create the new essay").action((project) => {
   createEssay(currentDate, project);

@@ -78,7 +78,8 @@ excerpt:
 }
 export function makeImportPic(html: string) {
   let IMGIMPORT = "";
-  const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g);
+  const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)"\>/g);
+
   const importStatements = fileImgs?.map((img, index) => {
     const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
     const oneSrc = srcValues.split("/");
@@ -93,9 +94,10 @@ export function makeImportPic(html: string) {
   if (importStatements) {
     IMGIMPORT += importStatements.join("\n");
   }
+  console.log(IMGIMPORT);
   return IMGIMPORT;
 }
-export async function makeEssayPage(file: mdFile) {
+export function makeEssayPage(file: mdFile) {
   let TEMPLATE = `
   import Image from "next/image";
 import dynamic from "next/dynamic";

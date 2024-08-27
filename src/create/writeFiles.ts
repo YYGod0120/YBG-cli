@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { basePath, makeEssayPage } from "../constant/content";
-import { mdFile } from "../compile/extractMd";
+import { mdFile } from "../../types/files";
 import { writeCSS } from "./EssayCss";
 import { rimrafSync } from "rimraf";
 import { getRandomColor } from "../utils/randomColor";

@@ -1,7 +1,6 @@
 // src/compile/extractMd.ts
 import fs from "fs";
 import matter from "gray-matter";
-import { marked } from "marked";
 
 // src/utils/time.ts
 import dayjs from "dayjs";
@@ -92,7 +91,7 @@ excerpt:
 }
 function makeImportPic(html) {
   let IMGIMPORT = "";
-  const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)".*?\/>/g);
+  const fileImgs = html.match(/<img\s+src="(.*?)"\s+alt="(.*?)"\>/g);
   const importStatements = fileImgs?.map((img, index2) => {
     const [, srcValues] = img.match(/src\s*="(.*?)"/) || [];
     const oneSrc = srcValues.split("/");
@@ -103,9 +102,10 @@ import ${src.slice(0, src.lastIndexOf("."))} from "@/public${srcValues}"`;
   if (importStatements) {
     IMGIMPORT += importStatements.join("\n");
   }
+  console.log(IMGIMPORT);
   return IMGIMPORT;
 }
-async function makeEssayPage(file) {
+function makeEssayPage(file) {
   let TEMPLATE = `
   import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -146,7 +146,7 @@ export default function Page() {
 import he from "he";
 function ImageRepimg(html) {
   const processedHtml = html.replace(
-    /<img\s+src="([^"]*)"\s+alt="([^"]*)"(?:\s+width="([^"]*)")?[^>]*\/>/g,
+    /<img\s+src="(.*?)"\s+alt="(.*?)"\>/g,
     function(match, src, alt) {
       const modifiedSrc = src.split("/");
       const newSrc = modifiedSrc[modifiedSrc.length - 1];
@@ -187,6 +187,28 @@ function HtmlToNext(html) {
   return step4Html;
 }
 
+// src/compile/compileByRemark.ts
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
+import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
+import { visit } from "unist-util-visit";
+import { unified } from "unified";
+function handleImgSrc() {
+  return (tree) => {
+    visit(tree, "element", (node) => {
+      if (node.properties.src) {
+        node.properties.src = decodeURI(node.properties.src);
+      }
+    });
+  };
+}
+async function compileByRemark(content) {
+  const processor = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(handleImgSrc).use(rehypeStringify);
+  const result = await processor.process(content);
+  return result.toString();
+}
+
 // src/compile/extractMd.ts
 var _postFolder = path2.join(basePath, "/_posts");
 function simpleHash(input) {
@@ -212,8 +234,9 @@ async function compileFile(project) {
       ...parsedFile,
       data: { ...parsedFile.data, date: UTCToString(parsedFile.data.date) }
     };
-    const picPath = makeImportPic(await marked(parsedFile.content));
-    const htmlText = HtmlToNext(await marked(parsedFile.content));
+    const remarkContent = await compileByRemark(parsedFile.content);
+    const picPath = makeImportPic(remarkContent);
+    const htmlText = HtmlToNext(remarkContent);
     compiledFiles.push(
       picPath ? {
         id: simpleHash(file),
@@ -339,86 +362,18 @@ function removePage(file) {
   rimraf(foldPath, { preserveRoot: false });
 }
 
-// src/create/createFileData.ts
-import path7 from "path";
-import fs7 from "fs";
-
-// src/utils/transformType.ts
-function transformType(files) {
-  let newData = [];
-  files.forEach((file, index2) => {
-    const { mdMatter, mdHtml, id } = file;
-    const { data } = mdMatter;
-    const newMatter = {
-      ...data,
-      id,
-      html: mdHtml
-    };
-    newData.push(newMatter);
-  });
-  return newData;
-}
-
-// src/utils/sortByDate.ts
-function sortByDate(array) {
-  array.sort(function(a, b) {
-    const dateA = new Date(a.date).getTime();
-    const dateB = new Date(b.date).getTime();
-    return dateB - dateA;
-  });
-  return array;
-}
-
-// src/create/createFileData.ts
-function writeFileData() {
-  const fileDataPath = path7.join(
-    `${basePath}/app/[language]/lib/`,
-    "fileData.js"
-  );
-  const fileDataFolderPath = `${basePath}/app/[language]/lib/`;
-  fs7.mkdir(fileDataFolderPath, { recursive: true }, async (error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      const fileData = sortByDate(transformType(await compileFile()));
-      fs7.writeFile(
-        fileDataPath,
-        `/**
-        * @property {string} title - \u6587\u7AE0\u6807\u9898
-        * @property {string} date - \u6587\u7AE0\u65E5\u671F
-        * @property {string} categories - \u6587\u7AE0\u5206\u7C7B\uFF1AProject,Weekly,Life,Technology
-        * @property {string} excerpt - \u6982\u8FF0
-        * @property {string} html - \u89E3\u6790\u8FC7\u540E\u7684html
-        * @property {string} id - id
-        * 
-        */
-        const DATA = ${JSON.stringify(fileData)} 
-        module.exports = {
-            DATA,
-          };
-          `,
-        (err) => {
-          if (err) {
-            console.error("Error creating file:", err);
-          }
-        }
-      );
-    }
-  });
-}
-
 // src/deploy/index.ts
-import fs9 from "fs";
-import path9 from "path";
+import fs8 from "fs";
+import path8 from "path";
 import { spawn } from "child_process";
 
 // src/utils/readConfig.ts
-import fs8 from "fs";
-import path8 from "path";
+import fs7 from "fs";
+import path7 from "path";
 function readConfig() {
-  const jsonFilePath = path8.join(basePath, "_blog.json");
+  const jsonFilePath = path7.join(basePath, "_blog.json");
   return new Promise((resolve, reject) => {
-    fs8.readFile(jsonFilePath, "utf8", (err, data) => {
+    fs7.readFile(jsonFilePath, "utf8", (err, data) => {
       if (err) {
         reject(err);
         return;
@@ -435,7 +390,7 @@ function readConfig() {
 
 // src/deploy/index.ts
 var currentDir = process.cwd();
-var gitFolderPath = path9.join(currentDir, ".git");
+var gitFolderPath = path8.join(currentDir, ".git");
 function git(...args) {
   return new Promise((resolve, reject) => {
     const child = spawn("git", args, { cwd: currentDir });
@@ -457,7 +412,7 @@ function git(...args) {
 async function init() {
   const json = await readConfig();
   const { deployCon } = json;
-  fs9.rm(gitFolderPath, { recursive: true, force: true }, (err) => {
+  fs8.rm(gitFolderPath, { recursive: true, force: true }, (err) => {
     if (err) {
       console.error("\u5220\u9664 .git \u6587\u4EF6\u5939\u65F6\u51FA\u9519\uFF1A", err);
       return;
@@ -490,12 +445,12 @@ async function index() {
 }
 
 // src/create/createI18nFile.ts
-import fs11 from "fs";
-import path11 from "path";
+import fs10 from "fs";
+import path10 from "path";
 
 // src/compile/translateMd.ts
-import { unified } from "unified";
-import fs10 from "fs";
+import { unified as unified2 } from "unified";
+import fs9 from "fs";
 import stringify from "remark-stringify";
 import markdown from "remark-parse";
 
@@ -532,18 +487,18 @@ async function translateWord(q) {
 }
 
 // src/compile/translateMd.ts
-import { visit } from "unist-util-visit";
-import path10 from "path";
+import { visit as visit2 } from "unist-util-visit";
+import path9 from "path";
 import frontmatter from "remark-frontmatter";
-var _postFolder2 = path10.join(basePath, "/_posts");
+var _postFolder2 = path9.join(basePath, "/_posts");
 async function translateMd(file) {
-  const filePath = path10.join(_postFolder2, `${file}.md`);
-  const fileContent = fs10.readFileSync(filePath, "utf-8");
+  const filePath = path9.join(_postFolder2, `${file}.md`);
+  const fileContent = fs9.readFileSync(filePath, "utf-8");
   const title = `essay-${file}.json`;
   const translation = [];
-  const processor = await unified().use(markdown).use(frontmatter, ["yaml"]).use(stringify);
+  const processor = await unified2().use(markdown).use(frontmatter, ["yaml"]).use(stringify);
   const ast = processor.parse(fileContent);
-  visit(ast, "text", (node) => {
+  visit2(ast, "text", (node) => {
     if (node.value) {
       translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
     }
@@ -556,7 +511,7 @@ async function translateMd(file) {
 }
 
 // src/create/createI18nFile.ts
-var i18nFolder = path11.join(basePath, "/app/i18n/locales");
+var i18nFolder = path10.join(basePath, "/app/i18n/locales");
 async function createI18nFile(file) {
   const zh = {};
   const en = {};
@@ -566,12 +521,12 @@ async function createI18nFile(file) {
     zh[index2] = item.src;
     en[index2] = item.dst_en;
   });
-  fs11.writeFileSync(
-    path11.join(i18nFolder, "zh-CN", `essay-${file}.json`),
+  fs10.writeFileSync(
+    path10.join(i18nFolder, "zh-CN", `essay-${file}.json`),
     JSON.stringify(zh, null, 2)
   );
-  fs11.writeFileSync(
-    path11.join(i18nFolder, "en-US", `essay-${file}.json`),
+  fs10.writeFileSync(
+    path10.join(i18nFolder, "en-US", `essay-${file}.json`),
     JSON.stringify(en, null, 2)
   );
 }
@@ -582,7 +537,6 @@ cli.command("compile [project]", "mdToTsx").option("-a, --all", "Compile all pro
   const { all } = options;
   const files = all ? await compileFile() : await compileFile(project);
   writeFile(files);
-  writeFileData();
 });
 cli.command("create [project]", "create the new essay").action((project) => {
   createEssay(currentDate, project);
