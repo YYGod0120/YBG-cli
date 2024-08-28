@@ -13,7 +13,7 @@ import { unified } from "unified";
 
 //禁止中文自动编码
 function handleImgSrc() {
-  return (tree) => {
+  return (tree: any) => {
     visit(tree, "element", (node) => {
       if (node.properties.src) {
         // 直接保留原始路径，防止任何自动编码

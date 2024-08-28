@@ -464,7 +464,11 @@ var SIGN = process.env.SIGN;
 var salt = "1435660288";
 console.log(`APPID: ${APPID}, SIGN: ${SIGN}`);
 function utf8Encode(str) {
-  return Buffer.from(str, "utf-8").toString();
+  return Buffer.from(
+    //该死的加号
+    encodeURIComponent(str).replace(/\+/g, "%2B"),
+    "utf-8"
+  ).toString();
 }
 function generateSignature(appid, q, salt2, secretKey) {
   const str1 = `${appid}${q}${salt2}${secretKey}`;
@@ -479,34 +483,45 @@ async function translateWord(q) {
     const from = "zh";
     const to = "en";
     const finallyUrl = URL + `?q=${utf8Encode(q)}&from=${from}&to=${to}&appid=${APPID}&salt=${salt}&sign=${sign}`;
-    const rep = await fetch(finallyUrl);
-    const data = await rep.json();
-    const result = data.trans_result;
-    return result[0].dst;
+    try {
+      const rep = await fetch(finallyUrl);
+      const data = await rep.json();
+      console.log("data:", data);
+      const result = data.trans_result;
+      return result[0].dst;
+    } catch (e) {
+      console.error(e);
+      return "error";
+    }
   }
 }
 
 // src/compile/translateMd.ts
 import { visit as visit2 } from "unist-util-visit";
 import path9 from "path";
-import frontmatter from "remark-frontmatter";
 var _postFolder2 = path9.join(basePath, "/_posts");
+function translateNode(translation) {
+  return async (tree) => {
+    visit2(tree, "text", (node) => {
+      if (node.value) {
+        translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
+        console.log({ src: node.value.replace(/\n/g, ""), dst_en: "" });
+      }
+    });
+    for (const item of translation) {
+      const dst = await translateWord(item.src);
+      item.dst_en = dst;
+    }
+    return tree;
+  };
+}
 async function translateMd(file) {
+  const translation = [];
   const filePath = path9.join(_postFolder2, `${file}.md`);
   const fileContent = fs9.readFileSync(filePath, "utf-8");
-  const title = `essay-${file}.json`;
-  const translation = [];
-  const processor = await unified2().use(markdown).use(frontmatter, ["yaml"]).use(stringify);
-  const ast = processor.parse(fileContent);
-  visit2(ast, "text", (node) => {
-    if (node.value) {
-      translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
-    }
-  });
-  for (const item of translation) {
-    const dst = await translateWord(item.src);
-    item.dst_en = dst;
-  }
+  const processor = unified2().use(markdown).use(stringify).use(translateNode, translation);
+  await processor.process(fileContent);
+  console.log(translation);
   return translation;
 }
 
@@ -516,7 +531,6 @@ async function createI18nFile(file) {
   const zh = {};
   const en = {};
   const tanslation = await translateMd(file);
-  console.log(tanslation);
   tanslation.forEach((item, index2) => {
     zh[index2] = item.src;
     en[index2] = item.dst_en;
