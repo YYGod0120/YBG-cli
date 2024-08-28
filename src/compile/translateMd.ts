@@ -10,12 +10,20 @@ import frontmatter from "remark-frontmatter";
 import { Translation } from "../../types/translate";
 const _postFolder = path.join(basePath, "/_posts");
 
+// // 自定义插件来查看 HAST
+// function inspectAst() {
+//   return (tree) => {
+//     console.log(JSON.stringify(tree, null, 2));
+//   };
+// }
+
 function translateNode(translation: Translation) {
   return async (tree: any) => {
     visit(tree, "text", (node) => {
       if (node.value) {
+        console.log(node);
+
         translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
-        console.log({ src: node.value.replace(/\n/g, ""), dst_en: "" });
       }
     });
     // 翻译
@@ -36,10 +44,10 @@ export async function translateMd(file: string) {
   // 创建处理器
   const processor = unified()
     .use(markdown)
+    .use(frontmatter)
     .use(stringify)
     .use(translateNode, translation);
   await processor.process(fileContent);
-  console.log(translation);
 
   return translation;
 }

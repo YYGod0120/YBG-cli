@@ -115,10 +115,16 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "@/app/[language]/essay/essay.css";
-export default function Page() {
+import { useTranslation } from "@/app/i18n";
+export default async function Page({
+  params: { language },
+}: {
+  params: { language: string };
+}) {
   const Comment = dynamic(() => import("@/app/[language]/components/Comment"), {
     ssr: false,
   });
+  const { t } = await useTranslation(language, "essay-${file.mdMatter.data.title}");
   return (
     <div>
     <div className="mt-8 bg-white flex flex-col items-start text-lg shadow-lg rounded-sm">
@@ -194,6 +200,17 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
 import { unified } from "unified";
+function conpileValue() {
+  return (tree) => {
+    let i = 0;
+    visit(tree, "text", (node, index2) => {
+      if (node.value && node.value !== "\n") {
+        node.value = `{t("${i}")}`;
+        i++;
+      }
+    });
+  };
+}
 function handleImgSrc() {
   return (tree) => {
     visit(tree, "element", (node) => {
@@ -204,7 +221,7 @@ function handleImgSrc() {
   };
 }
 async function compileByRemark(content) {
-  const processor = unified().use(remarkParse).use(remarkGfm).use(remarkRehype).use(handleImgSrc).use(rehypeStringify);
+  const processor = unified().use(remarkParse).use(remarkGfm).use(conpileValue).use(remarkRehype).use(handleImgSrc).use(rehypeStringify);
   const result = await processor.process(content);
   return result.toString();
 }
@@ -499,13 +516,14 @@ async function translateWord(q) {
 // src/compile/translateMd.ts
 import { visit as visit2 } from "unist-util-visit";
 import path9 from "path";
+import frontmatter from "remark-frontmatter";
 var _postFolder2 = path9.join(basePath, "/_posts");
 function translateNode(translation) {
   return async (tree) => {
     visit2(tree, "text", (node) => {
       if (node.value) {
+        console.log(node);
         translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
-        console.log({ src: node.value.replace(/\n/g, ""), dst_en: "" });
       }
     });
     for (const item of translation) {
@@ -519,9 +537,8 @@ async function translateMd(file) {
   const translation = [];
   const filePath = path9.join(_postFolder2, `${file}.md`);
   const fileContent = fs9.readFileSync(filePath, "utf-8");
-  const processor = unified2().use(markdown).use(stringify).use(translateNode, translation);
+  const processor = unified2().use(markdown).use(frontmatter).use(stringify).use(translateNode, translation);
   await processor.process(fileContent);
-  console.log(translation);
   return translation;
 }
 
