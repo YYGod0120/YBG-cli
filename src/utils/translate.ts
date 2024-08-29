@@ -14,7 +14,11 @@ interface TranslateRep {
   trans_result: { src: string; dst: string }[];
 }
 function utf8Encode(str: string): string {
-  return Buffer.from(str, "utf-8").toString();
+  return Buffer.from(
+    //该死的加号
+    encodeURIComponent(str).replace(/\+/g, "%2B"),
+    "utf-8"
+  ).toString();
 }
 
 function generateSignature(
@@ -27,7 +31,6 @@ function generateSignature(
   const str1 = `${appid}${q}${salt}${secretKey}`;
   // 计算签名（MD5加密）
   const sign = crypto.createHash("md5").update(str1, "utf8").digest("hex");
-
   return sign;
 }
 export async function translateWord(q: string): Promise<string> {
@@ -45,10 +48,15 @@ export async function translateWord(q: string): Promise<string> {
       `&appid=${APPID}` +
       `&salt=${salt}` +
       `&sign=${sign}`;
-
-    const rep = await fetch(finallyUrl);
-    const data: TranslateRep = (await rep.json()) as TranslateRep;
-    const result = data.trans_result;
-    return result[0].dst;
+    try {
+      const rep = await fetch(finallyUrl);
+      const data: TranslateRep = (await rep.json()) as TranslateRep;
+      console.log("data:", data);
+      const result = data.trans_result;
+      return result[0].dst;
+    } catch (e) {
+      console.error(e);
+      return "error";
+    }
   }
 }

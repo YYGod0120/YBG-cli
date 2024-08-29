@@ -8,8 +8,6 @@ export async function createI18nFile(file: string) {
   const zh = {};
   const en = {};
   const tanslation = await translateMd(file);
-  console.log(tanslation);
-
   tanslation.forEach((item, index) => {
     zh[index] = item.src;
     en[index] = item.dst_en;
