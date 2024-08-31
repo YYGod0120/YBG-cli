@@ -1,4 +1,4 @@
-import { mdFile } from "../compile/extractMd";
+import { mdFile } from "../../types/files";
 
 //解析类型
 export function transformType(files: mdFile[]) {
