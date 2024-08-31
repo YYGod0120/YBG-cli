@@ -107,15 +107,13 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "@/app/[language]/essay/essay.css";
-import { useTranslation } from "@/app/i18n";
+import { useTranslation } from "@/app/i18n";pnpm add -D @types/react @types/node @types/next
+
 export default async function Page({
   params: { language },
 }: {
   params: { language: string };
 }) {
-  const Comment = dynamic(() => import("@/app/[language]/components/Comment"), {
-    ssr: false,
-  });
   const { t } = await useTranslation(language, "essay-${
     file.mdMatter.data.title
   }");
@@ -135,9 +133,6 @@ export default async function Page({
     </div>
     
   </div>
-  <div className="mt-12 py-8 bg-white px-6">
-  <Comment />
-</div>
     </div>
   );
 }`;

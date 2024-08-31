@@ -22,14 +22,12 @@ function translateNode(translation: Translation) {
     visit(tree, "text", (node) => {
       if (node.value) {
         console.log(node);
-
         translation.push({ src: node.value.replace(/\n/g, ""), dst_en: "" });
       }
     });
     // 翻译
     for (const item of translation) {
       const dst = await translateWord(item.src);
-
       item.dst_en = dst;
     }
     return tree;
@@ -48,6 +46,5 @@ export async function translateMd(file: string) {
     .use(stringify)
     .use(translateNode, translation);
   await processor.process(fileContent);
-
   return translation;
 }

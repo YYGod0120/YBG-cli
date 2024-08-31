@@ -36,7 +36,6 @@ function highLightHtml(html: string) {
       return `<SyntaxHighlighter language="${language}" style={oneLight} showLineNumbers>{ \`${codeWithBackslash}\` }</SyntaxHighlighter>`;
     }
   );
-
   return replacedString1;
 }
 export function HtmlToNext(html: string) {

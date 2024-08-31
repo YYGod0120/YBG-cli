@@ -16,7 +16,7 @@ interface TranslateRep {
 function utf8Encode(str: string): string {
   return Buffer.from(
     //该死的加号
-    encodeURIComponent(str).replace(/\+/g, "%2B"),
+    encodeURIComponent(str),
     "utf-8"
   ).toString();
 }
