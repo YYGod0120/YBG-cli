@@ -115,7 +115,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // @ts-ignore
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "@/app/[language]/essay/essay.css";
-import { useTranslation } from "@/app/i18n";pnpm add -D @types/react @types/node @types/next
+import { useTranslation } from "@/app/i18n";
 
 export default async function Page({
   params: { language },
