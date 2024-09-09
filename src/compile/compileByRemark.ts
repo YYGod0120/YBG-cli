@@ -34,6 +34,17 @@ function handleImgSrc() {
     });
   };
 }
+// ol标签错误
+function fixOlBug() {
+  return (tree: any) => {
+    visit(tree, "element", (node) => {
+      if (node.tagName === "ol") {
+        // 直接保留原始路径，防止任何自动编码
+        node.properties = {};
+      }
+    });
+  };
+}
 export async function compileByRemark(content: string) {
   const processor = unified()
     .use(remarkParse)
@@ -41,7 +52,10 @@ export async function compileByRemark(content: string) {
     .use(conpileValue)
     .use(remarkRehype)
     .use(handleImgSrc)
+    .use(fixOlBug)
+    .use(inspectAst)
     .use(rehypeStringify);
+
   const result = await processor.process(content);
   return result.toString();
 }

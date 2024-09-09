@@ -195,6 +195,11 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
 import { unified } from "unified";
+function inspectAst() {
+  return (tree) => {
+    console.log(JSON.stringify(tree, null, 2));
+  };
+}
 function conpileValue() {
   return (tree) => {
     let i = 0;
@@ -215,8 +220,17 @@ function handleImgSrc() {
     });
   };
 }
+function fixOlBug() {
+  return (tree) => {
+    visit(tree, "element", (node) => {
+      if (node.tagName === "ol") {
+        node.properties = {};
+      }
+    });
+  };
+}
 async function compileByRemark(content) {
-  const processor = unified().use(remarkParse).use(remarkGfm).use(conpileValue).use(remarkRehype).use(handleImgSrc).use(rehypeStringify);
+  const processor = unified().use(remarkParse).use(remarkGfm).use(conpileValue).use(remarkRehype).use(handleImgSrc).use(fixOlBug).use(inspectAst).use(rehypeStringify);
   const result = await processor.process(content);
   return result.toString();
 }
