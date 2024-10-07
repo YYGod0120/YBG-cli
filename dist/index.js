@@ -295,9 +295,6 @@ function writeCSS() {
   });
 }
 
-// src/create/writeFiles.ts
-import { rimrafSync } from "rimraf";
-
 // src/utils/randomColor.ts
 import pkg from "picocolors";
 var { cyan, yellow, green, red, blue } = pkg;
@@ -310,9 +307,6 @@ function getRandomColor(string) {
 // src/create/writeFiles.ts
 function writeFile(files) {
   files.forEach(async (file) => {
-    rimrafSync(`${basePath}/app/[language]/essay/${file.mdMatter.data.date}`, {
-      preserveRoot: false
-    });
     const foldPath = `${basePath}/app/[language]/essay/${file.mdMatter.data.date}/${file.id}`;
     const filePath = path4.join(foldPath, "page.tsx");
     const content = await makeEssayPage(file);
