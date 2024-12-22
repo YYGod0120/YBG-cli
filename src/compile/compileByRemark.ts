@@ -5,11 +5,11 @@ import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
 import { unified } from "unified";
 // 自定义插件来查看 HAST
-function inspectAst() {
-  return (tree) => {
-    console.log(JSON.stringify(tree, null, 2));
-  };
-}
+// function inspectAst() {
+//   return (tree) => {
+//     console.log(JSON.stringify(tree, null, 2));
+//   };
+// }
 
 //编译
 function conpileValue() {
@@ -53,7 +53,7 @@ export async function compileByRemark(content: string) {
     .use(remarkRehype)
     .use(handleImgSrc)
     .use(fixOlBug)
-    .use(inspectAst)
+    // .use(inspectAst)
     .use(rehypeStringify);
 
   const result = await processor.process(content);

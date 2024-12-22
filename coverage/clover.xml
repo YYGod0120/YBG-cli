@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1734856466097" clover="3.2.0">
+  <project timestamp="1734856466097" name="All files">
+    <metrics statements="17" coveredstatements="16" conditionals="5" coveredconditionals="4" methods="10" coveredmethods="10" elements="32" coveredelements="30" complexity="0" loc="17" ncloc="17" packages="1" files="1" classes="1"/>
+    <file name="compileByRemark.ts" path="/Users/yeyan2/Desktop/YBG-cli/src/compile/compileByRemark.ts">
+      <metrics statements="17" coveredstatements="16" conditionals="5" coveredconditionals="4" methods="10" coveredmethods="10"/>
+      <line num="16" count="1" type="stmt"/>
+      <line num="17" count="1" type="stmt"/>
+      <line num="18" count="1" type="stmt"/>
+      <line num="19" count="145" type="cond" truecount="3" falsecount="0"/>
+      <line num="20" count="145" type="stmt"/>
+      <line num="21" count="145" type="stmt"/>
+      <line num="28" count="1" type="stmt"/>
+      <line num="29" count="1" type="stmt"/>
+      <line num="30" count="188" type="cond" truecount="0" falsecount="1"/>
+      <line num="32" count="0" type="stmt"/>
+      <line num="39" count="1" type="stmt"/>
+      <line num="40" count="1" type="stmt"/>
+      <line num="41" count="188" type="cond" truecount="1" falsecount="0"/>
+      <line num="43" count="1" type="stmt"/>
+      <line num="49" count="1" type="stmt"/>
+      <line num="59" count="1" type="stmt"/>
+      <line num="60" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>
